@@ -1,0 +1,157 @@
+<html>
+<head>
+	<title>LensToy</title>
+	<script src="binaryajax.js"></script>
+	<script src="fits.js"></script>
+	<script src="excanvas.js"></script>
+	<script type="text/javascript">
+
+		// Create a FITS object
+		var fits = new FITS();
+		
+		// Attach some events to the FITS object
+		fits.bind("click",function(e){
+
+			e.y = this.height - e.y
+			var value = this.image[e.y*this.width+e.x];
+			document.getElementById('status').innerHTML ='click=('+ e.x+','+e.y+')='+value;
+
+		}).bind("mousemove",function(e){
+
+			// Paste original image
+			this.clipboard.data = this.clipboardData;
+			this.ctx.putImageData(this.clipboard, 0, 0);
+
+
+			var imageData = this.ctx.getImageData(0, 0, this.width, this.height);
+
+
+			// Define some variables outside of the loop
+			var source = { x: e.x, y:e.y };
+			var delta = { x: 0, y: 0 };
+			var pos = 0;
+			var i = 0;
+//			var x = 0;
+//			var y = 0;
+			var r2 = 0;
+
+			// Loop over x and y. Store 1-D pixel index as i.
+			for (var row = 0 ; row < this.height ; row++){
+				for (var col = 0 ; col < this.width ; col++){
+
+					pos = i*4;
+
+					delta.x = col - source.x - this.alpha[i].x;
+					delta.y = row - source.y - this.alpha[i].y;
+
+					r2 = ( delta.x*delta.x + delta.y*delta.y );
+					this.predictedimage[i] = 255*Math.exp(-r2/8);
+
+					// Add to green channel
+					imageData.data[pos+1] = imageData.data[pos+1]+this.predictedimage[i];
+
+					// Add to blue channel
+					imageData.data[pos+2] = imageData.data[pos+1]+this.predictedimage[i];
+
+					i++;
+
+				}
+			}
+
+			this.ctx.putImageData(imageData, 0, 0);
+
+			// Add a circle to show where the source is
+			this.ctx.beginPath();
+			this.ctx.arc(e.x, e.y, 5, 0 , 2 * Math.PI, false);
+			this.ctx.fillStyle = "#BBBBFF";
+        	this.ctx.fill();
+        	this.ctx.closePath();
+
+
+
+
+			e.y = this.height - e.y
+			var value = this.image[e.y*this.width+e.x];
+			document.getElementById('status').innerHTML ='move=('+ e.x+','+e.y+')='+value;
+
+			
+
+		}).bind("load",function(){
+
+			document.getElementById('bitpix').innerHTML = this.header.BITPIX;
+			document.getElementById('depth').innerHTML = this.depth;
+			document.getElementById('z').value = 0;
+			this.draw("FITSimage");
+
+			this.lens = {x: parseInt(this.width/2), y: parseInt(this.height/2)};
+
+
+			this.clipboard = this.ctx.getImageData(0, 0, this.width, this.height);
+			this.clipboardData = this.clipboard.data;
+
+			this.alpha = new Array(this.width*this.height);
+			this.predictedimage = new Array(this.width*this.height);
+
+			var theta_e = 100;
+			
+			for(var i = 0 ; i < this.width*this.height ; i++){
+				var x = i % this.width - this.lens.x;
+				var y = Math.floor(i/this.width) - this.lens.y;
+				var r = Math.sqrt(x*x+y*y);
+				var cosphi = x/r;
+				var sinphi = y/r;
+				
+				this.alpha[i] = { x: theta_e*cosphi, y: theta_e*sinphi };
+			}
+			if(console && typeof console.log=="function") console.log('Loaded');
+
+
+		})
+
+		fits.load("simarc1.fits");
+
+		console.log(fits)
+	</script>
+
+	<style>
+	body {
+		margin: 10px;
+		font-family: Arial, sans-serif;
+		background-color: white;
+		color: black;
+	}
+	a { color: #5555aa; }
+	canvas { border: 1px solid #ff0000; }
+	code { color: #5555aa; }
+	pre { color: #5555aa; }
+	</style>
+</head>
+<body>
+
+	<h1>LensToy</h1>
+
+	Scaling function: <select name="scale" onChange="fits.update(this.value)">
+		<option selected>linear</option>
+		<option>sqrt</option>
+		<option>cuberoot</option>
+		<option>log</option>
+		<option>sqrtlog</option>
+		<option>loglog</option>
+	</select>
+
+	Color: <select name="scale" onChange="fits.update({color:this.value})">
+		<option selected>gray</option>
+		<option>heat</option>
+		<option>A</option>
+		<option>B</option>
+	</select>
+
+	Frame <button onClick="fits.update({index:--(document.getElementById('z').value)})">&lt;</button>
+	<input id="z" name="z" value="0" size=3 onChange="fits.update({index:this.value})">
+	<button onClick="fits.update({index:++(document.getElementById('z').value)})">&gt;</button> of <span id=depth></span>. Format: <span id=bitpix></span>.
+	<span id="status"></span>
+	<br>
+	<canvas id="FITSimage"></canvas>
+
+</body>
+</html>
