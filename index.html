@@ -74,12 +74,14 @@
 
 			e.y = this.height - e.y;
 			var value = this.image[e.y*this.width+e.x];
-			document.getElementById('status').innerHTML ='move=('+ e.x+','+e.y+')='+value;
+			document.getElementById('status').innerHTML ='Cursor = ('+ e.x+','+e.y+'). Value = '+value;
 
 			
 
 		}).bind("load",function(){
 
+			document.getElementById('status').innerHTML = "&nbsp;";
+			
 			document.getElementById('bitpix').innerHTML = this.header.BITPIX;
 			document.getElementById('depth').innerHTML = this.depth;
 			document.getElementById('z').value = 0;
@@ -151,7 +153,7 @@
 	Frame <button onClick="fits.update({index:--(document.getElementById('z').value)})">&lt;</button>
 	<input id="z" name="z" value="0" size=3 onChange="fits.update({index:this.value})">
 	<button onClick="fits.update({index:++(document.getElementById('z').value)})">&gt;</button> of <span id=depth></span>. Format: <span id=bitpix></span>.
-	<span id="status"></span>
+	<div id="status">Loading FITS file...</div>
 	<br>
 	<canvas id="FITSimage"></canvas>
 
