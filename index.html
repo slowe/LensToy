@@ -60,9 +60,11 @@
 
 			this.ctx.putImageData(imageData, 0, 0);
 
+			var r = 5;
 			// Add a circle to show where the source is
 			this.ctx.beginPath();
-			this.ctx.arc(e.x-2, e.y-2, 5, 0 , 2 * Math.PI, false);
+			this.ctx.arc(e.x-parseInt(r/2), e.y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
+			this.ctx.fillText("Source",e.x+r, e.y+r);
 			this.ctx.fillStyle = "#FF9999";
         	this.ctx.fill();
         	this.ctx.closePath();
@@ -70,7 +72,7 @@
 
 
 
-			e.y = this.height - e.y
+			e.y = this.height - e.y;
 			var value = this.image[e.y*this.width+e.x];
 			document.getElementById('status').innerHTML ='move=('+ e.x+','+e.y+')='+value;
 
