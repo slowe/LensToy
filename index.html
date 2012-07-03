@@ -8,7 +8,7 @@
 	window.onload = function(e){ 
 
 		// Create a FITS object. The ID is that of the <div>
-		var lens = new LensToy({id:'lenstoy'});
+		var lens = new LensToy({id:'lenstoy',xoff:-0.2,yoff:-4.5});
 		
 		// Attach a function to the load event
 		lens.bind("load",function(){

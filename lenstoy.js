@@ -14,6 +14,8 @@ function LensToy(input){
 	this.src = (input && typeof input.src=="string") ? input.src : "";
 	this.width = (input && typeof input.width=="number") ? input.width : parseInt(getStyle(this.id, 'width'), 10);
 	this.height = (input && typeof input.height=="number") ? input.height : parseInt(getStyle(this.id, 'height'), 10);
+	this.xoff = (input && typeof input.xoff=="number") ? input.xoff : 0;	// Horizontal offset in original image pixels
+	this.yoff = (input && typeof input.yoff=="number") ? input.yoff : 0;	// Vertical offset in original image pixels
 	this.theta_e = 10; // Units are detector pixels - about 2 arcsec
 	this.events = {load:"",click:"",mousemove:""};	// Let's define some events
 
@@ -213,7 +215,7 @@ LensToy.prototype.setScale = function(w){
 
 LensToy.prototype.createPredictedImage = function(){
 
-	this.lens = {x: parseInt(this.width/2), y: parseInt(this.height/2)};
+	this.lens = {x: parseInt(this.width/2)+this.xoff*this.scale, y: parseInt(this.height/2)-this.yoff*this.scale};
 
 	this.copyToClipboard();
 	this.alpha = new Array(this.width*this.height);
