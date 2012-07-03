@@ -66,6 +66,8 @@ LensToy.prototype.drawLensImage = function(source){
 
 			r2 = ( delta.x*delta.x + delta.y*delta.y );
 			this.predictedimage[i] = Math.round(0.1*255)*Math.exp(-r2/50.0);
+                  // MAGIC number 0.1, trades off with blur steps...
+                  // MAGIC number sigma=5 pixels, unlensed source radius...
 
 			// Add to red channel
 			imageData.data[pos+0] = 195;
@@ -102,6 +104,7 @@ LensToy.prototype.blur = function(imageData){
 	//return this.convolve(imageData, this.kernel);
 
 	var steps = 5;
+      // Kernel width 0.9", trades off with alpha channel...
 	var smallW = Math.round(this.width / this.scale);
 	var smallH = Math.round(this.height / this.scale);
 
