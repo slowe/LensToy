@@ -24,6 +24,67 @@ function LensToy(input){
 	this.setup(this.id);
 
 	if(this.src) this.load(this.src);
+
+	this.bind("mousemove",function(e){
+
+		if(!this.alpha) return;
+
+		var imageData = this.ctx.createImageData(this.width, this.height);
+
+		// Define some variables outside of the loop
+		var source = { x: e.x, y:e.y };
+		var delta = { x: 0, y: 0 };
+		var pos = 0;
+		var i = 0;
+		var r2 = 0;
+
+		// Loop over x and y. Store 1-D pixel index as i.
+		for (var row = 0 ; row < this.height ; row++){
+			for (var col = 0 ; col < this.width ; col++){
+
+
+				delta.x = col - source.x - this.alpha[i].x;
+				delta.y = row - source.y - this.alpha[i].y;
+
+				r2 = ( delta.x*delta.x + delta.y*delta.y );
+				this.predictedimage[i] = 255*Math.exp(-r2/8);
+
+				// Add to green channel
+				imageData.data[pos+1] = 255;
+
+				// Add to blue channel
+				imageData.data[pos+2] = 255;
+
+				// Alpha channel
+				imageData.data[pos+3] = this.predictedimage[i];
+
+				i++;
+				pos += 4;
+
+			}
+		}
+		// Because of the way putImageData replaces all the pixel values, 
+		// we have to create a temporary canvas and put it there.
+		var overlayCanvas = document.createElement("canvas");
+		overlayCanvas.width = this.width;
+		overlayCanvas.height = this.height;
+		overlayCanvas.getContext("2d").putImageData(imageData, 0, 0);
+		// Paste original image
+		this.pasteFromClipboard();
+		// Now we can combine the new image with our existing canvas
+		// whilst preserving transparency
+		this.ctx.drawImage(overlayCanvas, 0, 0);
+
+		var r = 5;
+		// Add a circle to show where the source is
+		this.ctx.beginPath();
+		this.ctx.arc(e.x-parseInt(r/2), e.y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
+		this.ctx.fillText("Source",e.x+r, e.y+r);
+		this.ctx.fillStyle = "#FF9999";
+		this.ctx.fill();
+		this.ctx.closePath();
+	});
+
 }
 
 // We need to set up the canvas. This may mean attaching to an existing <div>
@@ -95,12 +156,37 @@ LensToy.prototype.load = function(source,fnCallback){
 
 		this.img = new Image();
 		this.img.onload = function(){
+			_obj.draw();
+			_obj.createPredictedImage();
 			// Call any callback functions
 			if(typeof fnCallback=="function") fnCallback(_obj);
 			_obj.trigger("load");
 		}
 		this.img.src = this.src;
 	}
+	return this;
+}
+
+LensToy.prototype.createPredictedImage = function(){
+
+	this.lens = {x: parseInt(this.width/2), y: parseInt(this.height/2)};
+
+	this.copyToClipboard();
+	this.alpha = new Array(this.width*this.height);
+	this.predictedimage = new Array(this.width*this.height);
+
+	var theta_e = 100;
+	
+	for(var i = 0 ; i < this.width*this.height ; i++){
+		var x = i % this.width - this.lens.x;
+		var y = Math.floor(i/this.width) - this.lens.y;
+		var r = Math.sqrt(x*x+y*y);
+		var cosphi = x/r;
+		var sinphi = y/r;
+		
+		this.alpha[i] = { x: theta_e*cosphi, y: theta_e*sinphi };
+	}
+
 	return this;
 }
 
@@ -114,6 +200,7 @@ LensToy.prototype.copyToClipboard = function(){
 	}
 	return this;
 }
+
 LensToy.prototype.pasteFromClipboard = function(){
 	if(this.ctx){
 		// Will fail if the browser thinks the image was cross-domain
@@ -125,19 +212,14 @@ LensToy.prototype.pasteFromClipboard = function(){
 	return this;
 }
 
-
 // Use <canvas> to draw a 2D image
 LensToy.prototype.draw = function(type){
 	if(console && typeof console.log=="function") console.log('draw',this.canvas)
 	if(!this.ctx) return this;
 
-	return this.update();
-}
+	this.ctx.clearRect(0,0,this.width,this.height);
 
-// Draw onto the canvas
-LensToy.prototype.update = function(){
-
-	this.ctx.drawImage(this.img,0,0,this.width,this.height);
+//	this.ctx.drawImage(this.img,0,0,this.width,this.height);
 	return this;
 }
 
@@ -159,8 +241,10 @@ LensToy.prototype.getCursor = function(e){
 		target = target.offsetParent;
 	}
 	this.cursor = {x:x, y:y};
+	return this.cursor;
 }
 
+// A function that lets us attach functions to particular events
 LensToy.prototype.bind = function(ev,fn){
 	if(typeof ev!="string" || typeof fn!="function") return this;
 	if(this.events[ev]) this.events[ev].push(fn);
@@ -183,8 +267,6 @@ LensToy.prototype.trigger = function(ev,args){
 	}
 	if(o.length > 0) return o
 }
-
-
 
 
 // Helpful functions
