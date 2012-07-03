@@ -1,16 +1,17 @@
 <html>
 <head>
 	<title>LensToy</title>
-	<script src="binaryajax.js"></script>
-	<script src="fits.js"></script>
+	<script src="lenstoy.js"></script>
 	<!--[if lt IE 9]><script src="excanvas.min.js"></script><![endif]-->
 	<script type="text/javascript">
 
+	window.onload = function(e){ 
+
 		// Create a FITS object
-		var fits = new FITS();
+		var lens = new LensToy({id:'lenstoy',width:400,height:400});
 		
-		// Attach some events to the FITS object
-		fits.bind("click",function(e){
+		// Attach some events to the object
+		lens.bind("click",function(e){
 
 			e.y = this.height - e.y
 			var value = this.image[e.y*this.width+e.x];
@@ -19,9 +20,7 @@
 		}).bind("mousemove",function(e){
 
 			// Paste original image
-			this.clipboard.data = this.clipboardData;
-			this.ctx.putImageData(this.clipboard, 0, 0);
-
+			this.pasteFromClipboard();
 
 			var imageData = this.ctx.getImageData(0, 0, this.width, this.height);
 
@@ -31,8 +30,6 @@
 			var delta = { x: 0, y: 0 };
 			var pos = 0;
 			var i = 0;
-//			var x = 0;
-//			var y = 0;
 			var r2 = 0;
 
 			// Loop over x and y. Store 1-D pixel index as i.
@@ -70,28 +67,13 @@
         	this.ctx.closePath();
 
 
-
-
-			e.y = this.height - e.y;
-			var value = this.image[e.y*this.width+e.x];
-			document.getElementById('status').innerHTML ='Cursor = ('+ e.x+','+e.y+'). Value = '+value;
-
-			
-
 		}).bind("load",function(){
 
-			document.getElementById('status').innerHTML = "&nbsp;";
-			
-			document.getElementById('bitpix').innerHTML = this.header.BITPIX;
-			document.getElementById('depth').innerHTML = this.depth;
-			document.getElementById('z').value = 0;
-			this.draw("FITSimage");
+			this.draw();
 
 			this.lens = {x: parseInt(this.width/2), y: parseInt(this.height/2)};
 
-
-			this.clipboard = this.ctx.getImageData(0, 0, this.width, this.height);
-			this.clipboardData = this.clipboard.data;
+			this.copyToClipboard();
 
 			this.alpha = new Array(this.width*this.height);
 			this.predictedimage = new Array(this.width*this.height);
@@ -107,14 +89,12 @@
 				
 				this.alpha[i] = { x: theta_e*cosphi, y: theta_e*sinphi };
 			}
-			if(console && typeof console.log=="function") console.log('Loaded');
 
-
+			document.getElementById('status').innerHTML = "Loaded "+this.src;
 		})
 
-		fits.load("simarc1.fits");
-
-		console.log(fits)
+		lens.load("simarc1.png");
+	}
 	</script>
 
 	<style>
@@ -125,7 +105,7 @@
 		color: black;
 	}
 	a { color: #5555aa; }
-	canvas { border: 1px solid #ff0000; }
+	#lenstoy { border: 1px solid #ff0000; }
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
 	</style>
@@ -134,28 +114,9 @@
 
 	<h1>LensToy</h1>
 
-	Scaling function: <select name="scale" onChange="fits.update(this.value)">
-		<option selected>linear</option>
-		<option>sqrt</option>
-		<option>cuberoot</option>
-		<option>log</option>
-		<option>sqrtlog</option>
-		<option>loglog</option>
-	</select>
-
-	Color: <select name="scale" onChange="fits.update({color:this.value})">
-		<option selected>gray</option>
-		<option>heat</option>
-		<option>A</option>
-		<option>B</option>
-	</select>
-
-	Frame <button onClick="fits.update({index:--(document.getElementById('z').value)})">&lt;</button>
-	<input id="z" name="z" value="0" size=3 onChange="fits.update({index:this.value})">
-	<button onClick="fits.update({index:++(document.getElementById('z').value)})">&gt;</button> of <span id=depth></span>. Format: <span id=bitpix></span>.
-	<div id="status">Loading FITS file...</div>
+	<div id="status">Loading image...</div>
 	<br>
-	<canvas id="FITSimage"></canvas>
+	<div id="lenstoy"></div>
 
 </body>
 </html>
