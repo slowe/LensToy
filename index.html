@@ -11,87 +11,9 @@
 		var lens = new LensToy({id:'lenstoy',width:400,height:400});
 		
 		// Attach some events to the object
-		lens.bind("click",function(e){
-
-			e.y = this.height - e.y
-			var value = this.image[e.y*this.width+e.x];
-			document.getElementById('status').innerHTML ='click=('+ e.x+','+e.y+')='+value;
-
-		}).bind("mousemove",function(e){
-
-			// Paste original image
-			this.pasteFromClipboard();
-
-			var imageData = this.ctx.getImageData(0, 0, this.width, this.height);
-
-
-			// Define some variables outside of the loop
-			var source = { x: e.x, y:e.y };
-			var delta = { x: 0, y: 0 };
-			var pos = 0;
-			var i = 0;
-			var r2 = 0;
-
-			// Loop over x and y. Store 1-D pixel index as i.
-			for (var row = 0 ; row < this.height ; row++){
-				for (var col = 0 ; col < this.width ; col++){
-
-					pos = i*4;
-
-					delta.x = col - source.x - this.alpha[i].x;
-					delta.y = row - source.y - this.alpha[i].y;
-
-					r2 = ( delta.x*delta.x + delta.y*delta.y );
-					this.predictedimage[i] = 255*Math.exp(-r2/8);
-
-					// Add to green channel
-					imageData.data[pos+1] = imageData.data[pos+1]+this.predictedimage[i];
-
-					// Add to blue channel
-					imageData.data[pos+2] = imageData.data[pos+1]+this.predictedimage[i];
-
-					i++;
-
-				}
-			}
-
-			this.ctx.putImageData(imageData, 0, 0);
-
-			var r = 5;
-			// Add a circle to show where the source is
-			this.ctx.beginPath();
-			this.ctx.arc(e.x-parseInt(r/2), e.y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
-			this.ctx.fillText("Source",e.x+r, e.y+r);
-			this.ctx.fillStyle = "#FF9999";
-        	this.ctx.fill();
-        	this.ctx.closePath();
-
-
-		}).bind("load",function(){
-
-			this.draw();
-
-			this.lens = {x: parseInt(this.width/2), y: parseInt(this.height/2)};
-
-			this.copyToClipboard();
-
-			this.alpha = new Array(this.width*this.height);
-			this.predictedimage = new Array(this.width*this.height);
-
-			var theta_e = 100;
-			
-			for(var i = 0 ; i < this.width*this.height ; i++){
-				var x = i % this.width - this.lens.x;
-				var y = Math.floor(i/this.width) - this.lens.y;
-				var r = Math.sqrt(x*x+y*y);
-				var cosphi = x/r;
-				var sinphi = y/r;
-				
-				this.alpha[i] = { x: theta_e*cosphi, y: theta_e*sinphi };
-			}
-
+		lens.bind("load",function(){
 			document.getElementById('status').innerHTML = "Loaded "+this.src;
-		})
+		});
 
 		lens.load("simarc1.png");
 	}
@@ -116,7 +38,8 @@
 
 	<div id="status">Loading image...</div>
 	<br>
-	<div id="lenstoy"></div>
+	<img src="simarc1.png" style="z-index:1;position:absolute;"/>
+	<div id="lenstoy" style="z-index:10;position:absolute;"></div>
 
 </body>
 </html>
