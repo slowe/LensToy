@@ -108,7 +108,6 @@ LensToy.prototype.blur = function(imageData){
 	canvas.width = this.width;
 	canvas.height = this.height;
 	var ctx = canvas.getContext("2d");
-	console.log(ctx,imageData,this.width,this.height)
 	ctx.putImageData(imageData,0,0);
 
 	var copy = document.createElement("canvas");
