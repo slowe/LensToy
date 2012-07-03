@@ -7,20 +7,18 @@
 
 	window.onload = function(e){ 
 
-		// Create a FITS object
-            // var lens = new LensToy({id:'lenstoy',width:400,height:400});
-		var lens = new LensToy({id:'lenstoy',width:100,height:100});
+		// Create a FITS object. The ID is that of the <div>
+		var lens = new LensToy({id:'lenstoy'});
 		
-		// Attach some events to the object
-		// lens.bind("load",function(){
-		//	document.getElementById('status').innerHTML = "Loaded "+this.src;
-		// });
-	      lens.bind("load",function(){
-			document.getElementById('status').innerHTML = "Move the source around behind the lens...";
+		// Attach a function to the load event
+		lens.bind("load",function(){
+			document.getElementById('status').innerHTML = "Loaded "+this.src;
 		});
-
+		
+		// Load the image
 		// lens.load("simarc1.png");
 		lens.load("SL2SJ140156+554446_irg_100x100.png");
+
 	}
 	</script>
 
@@ -31,10 +29,15 @@
 		background-color: black;
 		color: white;
 	}
+	h1 { margin-bottom: 0.5em; }
 	a { color: #5555aa; }
 	#lenstoy { border: 1px solid #ff0000; }
+	#lensimg { border: 1px solid #00ff00; }
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
+	#main { position: relative; }
+	#status { margin-bottom: 0.5em; }
+	#lenstoy, #lensimg { width:400px;height:400px; }
 	</style>
 </head>
 <body>
@@ -43,9 +46,12 @@
 
 	<div id="status">Loading image...</div>
 	<br>
-	<!-- <img src="simarc1.png" style="z-index:1;position:absolute;"/> -->
-	<img src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
 	<div id="lenstoy" style="z-index:10;position:absolute;"></div>
+	<div id="main">
+		<!-- <img src="simarc1.png" style="z-index:1;position:absolute;"/> -->
+		<img src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
+		<div id="lenstoy" style="z-index:10;position:absolute;"></div>
+	</div>
 
 </body>
 </html>
