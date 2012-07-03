@@ -106,15 +106,21 @@ LensToy.prototype.load = function(source,fnCallback){
 
 LensToy.prototype.copyToClipboard = function(){
 	if(this.ctx){
-		this.clipboard = this.ctx.getImageData(0, 0, this.width, this.height);
-		this.clipboardData = this.clipboard.data;
+		// Will fail if the browser thinks the image was cross-domain
+		try {
+			this.clipboard = this.ctx.getImageData(0, 0, this.width, this.height);
+			this.clipboardData = this.clipboard.data;
+		}catch(e){};
 	}
 	return this;
 }
 LensToy.prototype.pasteFromClipboard = function(){
 	if(this.ctx){
-		this.clipboard.data = this.clipboardData;
-		this.ctx.putImageData(this.clipboard, 0, 0);
+		// Will fail if the browser thinks the image was cross-domain
+		try {
+			this.clipboard.data = this.clipboardData;
+			this.ctx.putImageData(this.clipboard, 0, 0);
+		}catch(e){};
 	}
 	return this;
 }
@@ -124,24 +130,15 @@ LensToy.prototype.pasteFromClipboard = function(){
 LensToy.prototype.draw = function(type){
 	if(console && typeof console.log=="function") console.log('draw',this.canvas)
 	if(!this.ctx) return this;
-	type = type || this.stretch;
 
-
-
-	// create a new batch of pixels with the same
-	// dimensions as the image:
-	imageData = this.ctx.createImageData(this.width, this.height);
-
-	var pos = 0;
-	this.update(type,0);
-	return this;
+	return this.update();
 }
 
-// Calculate the pixel values using a defined stretch type and draw onto the canvas
-LensToy.prototype.update = function(inp){
+// Draw onto the canvas
+LensToy.prototype.update = function(){
 
 	this.ctx.drawImage(this.img,0,0,this.width,this.height);
-
+	return this;
 }
 
 LensToy.prototype.getCursor = function(e){
