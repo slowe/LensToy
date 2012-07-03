@@ -90,7 +90,7 @@ LensToy.prototype.drawLensImage = function(source){
 	var overlayCanvas = document.createElement("canvas");
 	overlayCanvas.width = this.width;
 	overlayCanvas.height = this.height;
-	overlayCanvas.getContext("2d").putImageData(imageData, 0, 0, this.width, this.height);
+	overlayCanvas.getContext("2d").putImageData(imageData, 0, 0);
 
 	// Now we can combine the new image with our existing canvas
 	// whilst preserving transparency
@@ -108,7 +108,8 @@ LensToy.prototype.blur = function(imageData){
 	canvas.width = this.width;
 	canvas.height = this.height;
 	var ctx = canvas.getContext("2d");
-	ctx.putImageData(imageData,0,0,this.width,this.height);
+	console.log(ctx,imageData,this.width,this.height)
+	ctx.putImageData(imageData,0,0);
 
 	var copy = document.createElement("canvas");
 	copy.width = smallW;
