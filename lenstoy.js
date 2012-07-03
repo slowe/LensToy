@@ -14,9 +14,9 @@ function LensToy(input){
 	this.src = (input && typeof input.src=="string") ? input.src : "";
 	this.width = (input && typeof input.width=="number") ? input.width : parseInt(getStyle(this.id, 'width'), 10);
 	this.height = (input && typeof input.height=="number") ? input.height : parseInt(getStyle(this.id, 'height'), 10);
-	this.xoff = (input && typeof input.xoff=="number") ? input.xoff : 0;	// Horizontal offset in original image pixels
-	this.yoff = (input && typeof input.yoff=="number") ? input.yoff : 0;	// Vertical offset in original image pixels
-	this.theta_e = 10; // Units are detector pixels - about 2 arcsec
+	// Each lens component has its own position, relative to the image center.
+      // this.xoff = (input && typeof input.xoff=="number") ? input.xoff : 0;	// Horizontal offset in original image pixels
+	// this.yoff = (input && typeof input.yoff=="number") ? input.yoff : 0;	// Vertical offset in original image pixels
 	this.events = {load:"",click:"",mousemove:""};	// Let's define some events
 
 	this.img = { complete: false };
@@ -69,9 +69,9 @@ LensToy.prototype.drawLensImage = function(source){
 			this.predictedimage[i] = 255*Math.exp(-r2/18);
 
 			// Add to red channel
-			imageData.data[pos+0] = 255;
+			imageData.data[pos+0] = 195;
 			// Add to green channel
-			imageData.data[pos+1] = 255;
+			imageData.data[pos+1] = 215;
 			// Add to blue channel
 			imageData.data[pos+2] = 255;
 
@@ -215,22 +215,33 @@ LensToy.prototype.setScale = function(w){
 
 LensToy.prototype.createPredictedImage = function(){
 
-	this.lens = {x: parseInt(this.width/2)+this.xoff*this.scale, y: parseInt(this.height/2)-this.yoff*this.scale};
+	this.lens = [
+        {theta_e: 10.0, x: parseInt(this.width/2)+ 0.0*this.scale, y: parseInt(this.height/2)- 0.0*this.scale},
+        {theta_e:  3.0, x: parseInt(this.width/2)- 7.0*this.scale, y: parseInt(this.height/2)-27.0*this.scale},
+        {theta_e:  3.0, x: parseInt(this.width/2)+37.0*this.scale, y: parseInt(this.height/2)+37.0*this.scale},
+        {theta_e:  3.0, x: parseInt(this.width/2)+17.0*this.scale, y: parseInt(this.height/2)+52.0*this.scale},
+      ];
 
 	this.copyToClipboard();
-	this.alpha = new Array(this.width*this.height);
 	this.predictedimage = new Array(this.width*this.height);
-	
+	this.alpha = new Array(this.width*this.height);
 	for(var i = 0 ; i < this.width*this.height ; i++){
-		var x = i % this.width - this.lens.x;
-		var y = Math.floor(i/this.width) - this.lens.y;
-		var r = Math.sqrt(x*x+y*y);
-		var cosphi = x/r;
-		var sinphi = y/r;
-		
-		this.alpha[i] = { x: this.theta_e*this.scale*cosphi, y: this.theta_e*this.scale*sinphi };
+		this.alpha[i] = { x: 0.0, y: 0.0 };
 	}
+	
+	for(var j = 0 ; j < this.lens.length ; j++){
+            for(var i = 0 ; i < this.width*this.height ; i++){
+		      var x = i % this.width - this.lens[j].x;
+		      var y = Math.floor(i/this.width) - this.lens[j].y;
+		      var r = Math.sqrt(x*x+y*y);
+		      var cosphi = x/r;
+		      var sinphi = y/r;
 
+		      this.alpha[i].x += this.lens[j].theta_e*this.scale*cosphi;
+                  this.alpha[i].y += this.lens[j].theta_e*this.scale*sinphi;
+	      }
+      }
+      
 	return this;
 }
 
