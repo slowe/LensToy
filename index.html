@@ -11,8 +11,11 @@
 		var lens = new LensToy({id:'lenstoy',xoff:-0.2,yoff:-4.5});
 		
 		// Attach a function to the load event
+		// lens.bind("load",function(){
+		//     document.getElementById('status').innerHTML = "Loaded "+this.src;
+		// });
 		lens.bind("load",function(){
-			document.getElementById('status').innerHTML = "Loaded "+this.src;
+			document.getElementById('status').innerHTML = "Point to where the source might be...";
 		});
 		
 		// Load the image
@@ -31,8 +34,8 @@
 	}
 	h1 { margin-bottom: 0.5em; }
 	a { color: #5555aa; }
-	#lenstoy { border: 1px solid #ff0000; }
-	#lensimg { border: 1px solid #00ff00; }
+	#lenstoy { border: 2px solid #606060; }
+	#lensimg { border: 2px solid #606060; }
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
 	#main { position: relative; }

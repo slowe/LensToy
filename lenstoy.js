@@ -38,14 +38,14 @@ function LensToy(input){
 		this.drawLensImage({ x: e.x, y:e.y });
 
 
-		var r = 5;
 		// Add a circle to show where the source is
-		this.ctx.beginPath();
-		this.ctx.arc(e.x-parseInt(r/2), e.y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
-		this.ctx.fillText("Source",e.x+r, e.y+r);
-		this.ctx.fillStyle = "#FF9999";
-		this.ctx.fill();
-		this.ctx.closePath();
+		// var r = 5;
+		// this.ctx.beginPath();
+		// this.ctx.arc(e.x-parseInt(r/2), e.y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
+		// this.ctx.fillText("Source",e.x+r, e.y+r);
+		// this.ctx.fillStyle = "#FF9999";
+		// this.ctx.fill();
+		// this.ctx.closePath();
 	});
 
 }
@@ -66,7 +66,7 @@ LensToy.prototype.drawLensImage = function(source){
 			delta.y = row - source.y - this.alpha[i].y;
 
 			r2 = ( delta.x*delta.x + delta.y*delta.y );
-			this.predictedimage[i] = 255*Math.exp(-r2/8);
+			this.predictedimage[i] = 255*Math.exp(-r2/18);
 
 			// Add to red channel
 			imageData.data[pos+0] = 255;
