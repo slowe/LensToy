@@ -37,7 +37,6 @@ function LensToy(input){
 		// Draw the lensed image on top
 		this.drawLensImage({ x: e.x, y:e.y });
 
-
 		// Add a circle to show where the source is
 		// var r = 5;
 		// this.ctx.beginPath();
@@ -66,7 +65,7 @@ LensToy.prototype.drawLensImage = function(source){
 			delta.y = row - source.y - this.alpha[i].y;
 
 			r2 = ( delta.x*delta.x + delta.y*delta.y );
-			this.predictedimage[i] = 255*Math.exp(-r2/18);
+			this.predictedimage[i] = Math.round(0.1*255)*Math.exp(-r2/50.0);
 
 			// Add to red channel
 			imageData.data[pos+0] = 195;
@@ -95,12 +94,14 @@ LensToy.prototype.drawLensImage = function(source){
 	// Now we can combine the new image with our existing canvas
 	// whilst preserving transparency
 	this.ctx.drawImage(overlayCanvas, 0, 0);
+      
+      // This procedure includes some interpolation on to the larger canvas, preventing us seeing the pixels...
 }
 
 LensToy.prototype.blur = function(imageData){
 	//return this.convolve(imageData, this.kernel);
 
-	var steps = 1;
+	var steps = 5;
 	var smallW = Math.round(this.width / this.scale);
 	var smallH = Math.round(this.height / this.scale);
 
@@ -115,7 +116,9 @@ LensToy.prototype.blur = function(imageData){
 	copy.height = smallH;
 	var copyCtx = copy.getContext("2d");
 
-	for (var i=0;i<steps;i++) {
+	// Convolution with square top hat kernel, by shifting and redrawing image...
+      // Does not get brightness quite right...
+      for (var i=0;i<steps;i++) {
 		var scaledW = Math.max(1,Math.round(smallW - i));
 		var scaledH = Math.max(1,Math.round(smallH - i));
 
