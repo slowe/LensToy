@@ -175,7 +175,7 @@ LensToy.prototype.createPredictedImage = function(){
 	this.alpha = new Array(this.width*this.height);
 	this.predictedimage = new Array(this.width*this.height);
 
-	var theta_e = 100;
+	var theta_e = 10; // Units are detector pixels - about 2 arcsec
 	
 	for(var i = 0 ; i < this.width*this.height ; i++){
 		var x = i % this.width - this.lens.x;
