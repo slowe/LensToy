@@ -14,7 +14,7 @@ function LensToy(input){
 	this.src = (input && typeof input.src=="string") ? input.src : "";
 	this.width = (input && typeof input.width=="number") ? input.width : parseInt(getStyle(this.id, 'width'), 10);
 	this.height = (input && typeof input.height=="number") ? input.height : parseInt(getStyle(this.id, 'height'), 10);
-	this.theta_e = (input && typeof input.theta=="number") ? input.theta : 10; // Units are detector pixels - about 2 arcsec
+	this.theta_e = 10; // Units are detector pixels - about 2 arcsec
 	this.events = {load:"",click:"",mousemove:""};	// Let's define some events
 
 	this.img = { complete: false };
@@ -98,10 +98,9 @@ LensToy.prototype.drawLensImage = function(source){
 LensToy.prototype.blur = function(imageData){
 	//return this.convolve(imageData, this.kernel);
 
-	var scale = 4;
 	var steps = 1;
-	var smallW = Math.round(this.width / scale);
-	var smallH = Math.round(this.height / scale);
+	var smallW = Math.round(this.width / this.scale);
+	var smallH = Math.round(this.height / this.scale);
 
 	var canvas = document.createElement("canvas");
 	canvas.width = this.width;
@@ -126,67 +125,7 @@ LensToy.prototype.blur = function(imageData){
 	return ctx.getImageData(0,0,this.width,this.height);
 
 }
-LensToy.prototype.convolve = function(pixels, weights, opaque){
 
-	if(!this.kernel){
-		r = 15;
-		r2 = r*r;
-		v = 1/r2;
-		this.kernel = new Array(r2);
-		for(var i = 0 ; i < r2 ; i++){
-			this.kernel[i] = v;
-		}
-	}
-
-	var side = Math.round(Math.sqrt(weights.length));
-	var halfSide = Math.floor(side/2);
-	var src = pixels.data;
-	var sw = pixels.width;
-	var sh = pixels.height;
-	// pad output by the convolution matrix
-	var w = sw;
-	var h = sh;
-	var tmpCanvas = document.createElement('canvas');
-	var tmpCtx = tmpCanvas.getContext('2d');
-	var output = tmpCtx.createImageData(this.width, this.height);
-	var dst = output.data;
-	// go through the destination image pixels
-	var alphaFac = opaque ? 1 : 0;
-	var sy, sx, dstOff, r, g, b, a, wt, srcOff, scy, scx
-	for (var y=0; y<h; y++) {
-		for (var x=0; x<w; x++) {
-			sy = y;
-			sx = x;
-			dstOff = (y*w+x)*4;
-			// calculate the weighed sum of the source image pixels that
-			// fall under the convolution matrix
-			r=0;
-			g=0;
-			b=0;
-			a=0;
-			//if(src[dstOff+3] == 0) continue;
-			for (var cy=0; cy<side; cy++) {
-				for (var cx=0; cx<side; cx++) {
-					scy = sy + cy - halfSide;
-					scx = sx + cx - halfSide;
-					if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
-						srcOff = (scy*sw+scx)*4;
-						wt = weights[cy*side+cx];
-						r += src[srcOff] * wt;
-						g += src[srcOff+1] * wt;
-						b += src[srcOff+2] * wt;
-						a += src[srcOff+3] * wt;
-					}
-				}
-			}
-			dst[dstOff] = r;
-			dst[dstOff+1] = g;
-			dst[dstOff+2] = b;
-			dst[dstOff+3] = a + alphaFac*(255-a);
-		}
-	}
-	return output;
-}
 // We need to set up the canvas. This may mean attaching to an existing <div>
 // By the end of this function we have this.ctx available with events attached.
 // Make sure you have set the width/height of the canvas element
@@ -256,6 +195,7 @@ LensToy.prototype.load = function(source,fnCallback){
 
 		this.img = new Image();
 		this.img.onload = function(){
+			_obj.setScale(this.width);
 			_obj.draw();
 			_obj.createPredictedImage();
 			// Call any callback functions
@@ -265,6 +205,10 @@ LensToy.prototype.load = function(source,fnCallback){
 		this.img.src = this.src;
 	}
 	return this;
+}
+
+LensToy.prototype.setScale = function(w){
+	this.scale = this.width/w;
 }
 
 LensToy.prototype.createPredictedImage = function(){
@@ -282,7 +226,7 @@ LensToy.prototype.createPredictedImage = function(){
 		var cosphi = x/r;
 		var sinphi = y/r;
 		
-		this.alpha[i] = { x: this.theta_e*cosphi, y: this.theta_e*sinphi };
+		this.alpha[i] = { x: this.theta_e*this.scale*cosphi, y: this.theta_e*this.scale*sinphi };
 	}
 
 	return this;
