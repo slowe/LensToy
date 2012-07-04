@@ -28,11 +28,11 @@
 
 	<style>
 	body {
-		margin: 10px;
-		font-family: Arial, sans-serif;
+		font-family: 'Myriad Pro',Calibri,Helvetica,Arial,sans-serif;
 		background-color: black;
 		color: white;
 	}
+	h1, h2, h3, h4 { font-family: 'Lucida Grande','Calibri',Helvetica,Arial,sans-serif; }
 	h1 { margin-bottom: 0.5em; }
 	a { color: #5555aa; }
 	#lenstoy { border: 2px solid #606060; }
@@ -42,21 +42,44 @@
 	#main { position: relative; height:420px; }
 	#status { margin-bottom: 0.5em; }
 	#lenstoy, #lensimg { width:400px; height:400px; }
+	#forkme_banner {
+		background: url("http://slowe.github.com/graph/images/blacktocat.png") no-repeat scroll 95% 50% #0090FF;
+		border-bottom-left-radius: 2px;
+		border-bottom-right-radius: 2px;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+		color: #FFFFFF;
+		display: block;
+		font-weight: 700;
+		padding: 10px 50px 10px 10px;
+		position: absolute;
+		right: 10px;
+		top: 0;
+		z-index: 10;
+		text-decoration: none;
+	}
+	#page {
+		margin: 20px;
+	}
 	</style>
 </head>
 <body>
 
-	<h1>Lens Toy</h1>
-
-	<div id="status">Loading image...</div>
-	<br>
-	<div id="main">
-		<!-- <img src="simarc1.png" id="lensimg" style="z-index:1;position:absolute;"/> -->
-		<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
-		<div id="lenstoy" style="z-index:10;position:absolute;"></div>
+	<div id="page">
+		<header class="inner">
+			<a id="forkme_banner" href="https://github.com/slowe/LensToy">Fork Me on GitHub</a>
+			<h1>Lens Toy</h1>
+		</header>
+	
+		<div id="status">Loading image...</div>
+		<br>
+		<div id="main">
+			<!-- <img src="simarc1.png" id="lensimg" style="z-index:1;position:absolute;"/> -->
+			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
+			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
+		</div>
+	
+		<p align="left"><font size=-1><a href="https://github.com/slowe/LensToy">https://github.com/slowe/LensToy</a></p>
 	</div>
-
-      <p align="left"><font size=-1><a href="https://github.com/slowe/LensToy">https://github.com/slowe/LensToy</a></p>
 
 </body>
 </html>
