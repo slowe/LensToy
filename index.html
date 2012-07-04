@@ -32,13 +32,15 @@
 
 	<style>
 	#main_content_wrap { background: black; color: white; }
+	#main_content_wrap h2 { color: white; font-size: 1.4em;}
 	#lenstoy { border: 2px solid #606060; }
 	#lensimg { border: 2px solid #606060; }
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
-	#main { position: relative; height:420px; }
+	#main { position: relative; min-height:420px; }
 	#status { margin-bottom: 0.5em; }
 	#lenstoy, #lensimg { width:400px; height:400px; }
+	.footnote { font-size: 0.8em; }
 	</style>
 </head>
 <body>
@@ -69,7 +71,14 @@
 			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
 			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
 		</div>
-
+		<br style="clear:both;" />
+		<h2>What is gravitational lensing?</h2>
+		<p>Spacetime around massive objects, such as galaxy clusters, is curved. This means that the path of light from a more distant object, such as a quasar, gets deflected. This changes the apparent direction that the light is coming from. This effect can magnify and distort the image of the background object into multiple images and arcs. It is known as <a href="https://en.wikipedia.org/wiki/Gravitational_lensing">gravitational lensing</a>.</p>
+		<h2>What is LensToy?</h2>
+		<p>LensToy is our attempt to create a gravitational lens modeller using Javascript and &lt;<a href="https://en.wikipedia.org/wiki/Canvas_element">canvas</a>&gt;.</p>
+		<p>It shows you a real astronomical image of a tiny patch of sky. Each blob* in the image is a distant galaxy. We have modelled 4 foreground galaxies at the positions of the yellow blobs. Use your cursor to position a distant galaxy. We then calculate how the foreground galaxies will distort the light from the distant galaxy and plot it on top.</p>
+		<p>We've only just started making LensToy so it is very basic right now.</p>
+		<p class="footnote">* a highly technical astronomical term</p>
 <!--
         <h3>Welcome to GitHub Pages.</h3>
 
