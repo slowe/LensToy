@@ -1,7 +1,7 @@
 LensToy
 -------
 
-A gravitational lens simulator in a browser using HTML5's canvas and Javascript.
+A gravitational lens simulator in a browser using HTML5's canvas and Javascript. [View an example](http://slowe.github.com/LensToy/).
 
 
 Credits
