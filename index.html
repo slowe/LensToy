@@ -1,17 +1,47 @@
 <!DOCTYPE html>
 <html>
+<head>
+	<meta charset='utf-8' />
+	<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+	<meta name="description" content="Lenstoy : A gravitational lens simulator in Javascript/HTML5" />
+	<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+	<title>Lenstoy</title>
+	<script src="lenstoy.js"></script>
+	<!--[if lt IE 9]><script src="excanvas.min.js"></script><![endif]-->
+	<script type="text/javascript">
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Lenstoy : A gravitational lens simulator in Javascript/HTML5" />
+	window.onload = function(e){ 
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+		// Create a FITS object. The ID is that of the <div>
+		var lens = new LensToy({id:'lenstoy',xoff:-0.2,yoff:-4.5});
+		
+		// Attach a function to the load event
+		// lens.bind("load",function(){
+		//     document.getElementById('status').innerHTML = "Loaded "+this.src;
+		// });
+		lens.bind("load",function(){
+			document.getElementById('status').innerHTML = "Point to where the source might be...";
+		});
+		
+		// Load the image
+		// lens.load("simarc1.png");
+		lens.load("SL2SJ140156+554446_irg_100x100.png");
 
-    <title>Lenstoy</title>
-  </head>
+	}
+	</script>
 
-  <body>
+	<style>
+	#main_content_wrap { background: black; color: white; }
+	#lenstoy { border: 2px solid #606060; }
+	#lensimg { border: 2px solid #606060; }
+	code { color: #5555aa; }
+	pre { color: #5555aa; }
+	#main { position: relative; height:420px; }
+	#status { margin-bottom: 0.5em; }
+	#lenstoy, #lensimg { width:400px; height:400px; }
+	</style>
+</head>
+<body>
 
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
@@ -31,6 +61,16 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
+
+		<div id="status">Loading image...</div>
+		<br>
+		<div id="main">
+			<!-- <img src="simarc1.png" id="lensimg" style="z-index:1;position:absolute;"/> -->
+			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
+			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
+		</div>
+
+<!--
         <h3>Welcome to GitHub Pages.</h3>
 
 <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
@@ -57,6 +97,7 @@ $ git checkout gh-pages
 <h3>Support or Contact</h3>
 
 <p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+-->
       </section>
     </div>
 
