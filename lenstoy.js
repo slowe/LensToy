@@ -1,6 +1,7 @@
 /*
  * Javascript Lens Toy
- * 2012 Stuart Lowe http://lcogt.net/
+ * 2012-3 Stuart Lowe http://lcogt.net/
+ * Requires lens.js
  *
  * Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
  *
@@ -18,80 +19,88 @@ function LensToy(input){
       // this.xoff = (input && typeof input.xoff=="number") ? input.xoff : 0;	// Horizontal offset in original image pixels
 	// this.yoff = (input && typeof input.yoff=="number") ? input.yoff : 0;	// Vertical offset in original image pixels
 	this.events = {load:"",click:"",mousemove:""};	// Let's define some events
+	
+	// Create an instance of a lens,
+	this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
+	
+	// and add its lens mass and source brightness components (units=arcseconds):
+	this.lens.add({plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0});
+	this.lens.add({plane: "lens", theta_e:  3.0, x:  7.0, y: -27.0});
+	this.lens.add({plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0});
+	this.lens.add({plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0});
+	this.lens.add({plane: "source", size:  1.25, x: 1000.0, y:  1000.0});
+
+	// Calculate the deflection angle vector field, alpha(x,y):
+	this.lens.calculateAlpha();
+
+	// Now use this to calculate the lensed image:
+	this.lens.calculateImage();
 
 	this.img = { complete: false };
-	this.stretch = "linear";
-	this.color = "gray";
 
 	this.setup(this.id);
 
 	if(this.src) this.load(this.src);
 
-	this.bind("mousemove",function(e){
+	this.ctx.clearRect(0,0,this.width,this.height);
+	this.copyToClipboard();
 
-		if(!this.alpha) return;
+	this.bind("mousemove",{lens:this.lens},function(e){
+
+		// Remove existing sources
+		this.lens.removeAll('source');
+
+		// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
+		var coords = this.lens.pix2ang({x:e.x, y:e.y});
+		this.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
 
 		// Paste original image
 		this.pasteFromClipboard();
 
+		// Re-calculate the lensed image
+		this.lens.calculateImage();
+
 		// Draw the lensed image on top
 		this.drawLensImage({ x: e.x, y:e.y });
 
-		// Add a circle to show where the source is
-		// var r = 5;
-		// this.ctx.beginPath();
-		// this.ctx.arc(e.x-parseInt(r/2), e.y-parseInt(r/2), r, 0 , 2 * Math.PI, false);
-		// this.ctx.fillText("Source",e.x+r, e.y+r);
-		// this.ctx.fillStyle = "#FF9999";
-		// this.ctx.fill();
-		// this.ctx.closePath();
 	});
 
 }
 LensToy.prototype.drawLensImage = function(source){
-	var imageData = this.ctx.createImageData(this.width, this.height);
 
-	// Define some variables outside of the loop
-	var delta = { x: 0, y: 0 };
+	var imgData = this.ctx.createImageData(this.width, this.height);
 	var pos = 0;
-	var i = 0;
-	var r2 = 0;
+	var c = [195, 215, 255];
+	
+	// Loop over the kappa map
+	for(var i = 0; i < this.width*this.height ; i++){
 
-	// Loop over x and y. Store 1-D pixel index as i.
-	for (var row = 0 ; row < this.height ; row++){
-		for (var col = 0 ; col < this.width ; col++){
+		// Add to red channel
+		imgData.data[pos+0] = c[0];
 
-			delta.x = col - source.x - this.alpha[i].x;
-			delta.y = row - source.y - this.alpha[i].y;
+		// Add to green channel
+		imgData.data[pos+1] = c[1];
 
-			r2 = ( delta.x*delta.x + delta.y*delta.y );
-			this.predictedimage[i] = Math.round(0.1*255)*Math.exp(-r2/50.0);
-                  // MAGIC number 0.1, trades off with blur steps...
-                  // MAGIC number sigma=5 pixels, unlensed source radius...
+		// Add to blue channel
+		imgData.data[pos+2] = c[2];
 
-			// Add to red channel
-			imageData.data[pos+0] = 195;
-			// Add to green channel
-			imageData.data[pos+1] = 215;
-			// Add to blue channel
-			imageData.data[pos+2] = 255;
+		// Alpha channel
+		// MAGIC number 0.1, trades off with blur steps...
+		imgData.data[pos+3] = Math.round(0.1*255)*this.lens.predictedimage[i];
 
-			// Alpha channel
-			imageData.data[pos+3] = this.predictedimage[i];
-
-			i++;
-			pos += 4;
-		}
+		pos += 4;
 	}
 
-	imageData = this.blur(imageData);
+	// Blur the image
+	imgData = this.blur(imgData);
+
 
 	// Because of the way putImageData replaces all the pixel values, 
 	// we have to create a temporary canvas and put it there.
 	var overlayCanvas = document.createElement("canvas");
 	overlayCanvas.width = this.width;
 	overlayCanvas.height = this.height;
-	overlayCanvas.getContext("2d").putImageData(imageData, 0, 0);
+	overlayCanvas.getContext("2d").putImageData(imgData, 0, 0);
 
 	// Now we can combine the new image with our existing canvas
 	// whilst preserving transparency
@@ -205,7 +214,7 @@ LensToy.prototype.load = function(source,fnCallback){
 		this.img.onload = function(){
 			_obj.setScale(this.width);
 			_obj.draw();
-			_obj.createPredictedImage();
+			_obj.lens.calculateImage();
 			// Call any callback functions
 			if(typeof fnCallback=="function") fnCallback(_obj);
 			_obj.trigger("load");
@@ -217,38 +226,6 @@ LensToy.prototype.load = function(source,fnCallback){
 
 LensToy.prototype.setScale = function(w){
 	this.scale = this.width/w;
-}
-
-LensToy.prototype.createPredictedImage = function(){
-
-	this.lens = [
-        {theta_e: 10.0, x: parseInt(this.width/2)+ 0.0*this.scale, y: parseInt(this.height/2)- 0.0*this.scale},
-        {theta_e:  3.0, x: parseInt(this.width/2)- 7.0*this.scale, y: parseInt(this.height/2)-27.0*this.scale},
-        {theta_e:  3.0, x: parseInt(this.width/2)+37.0*this.scale, y: parseInt(this.height/2)+37.0*this.scale},
-        {theta_e:  3.0, x: parseInt(this.width/2)+17.0*this.scale, y: parseInt(this.height/2)+52.0*this.scale},
-      ];
-
-	this.copyToClipboard();
-	this.predictedimage = new Array(this.width*this.height);
-	this.alpha = new Array(this.width*this.height);
-	for(var i = 0 ; i < this.width*this.height ; i++){
-		this.alpha[i] = { x: 0.0, y: 0.0 };
-	}
-	
-	for(var j = 0 ; j < this.lens.length ; j++){
-            for(var i = 0 ; i < this.width*this.height ; i++){
-		      var x = i % this.width - this.lens[j].x;
-		      var y = Math.floor(i/this.width) - this.lens[j].y;
-		      var r = Math.sqrt(x*x+y*y);
-		      var cosphi = x/r;
-		      var sinphi = y/r;
-
-		      this.alpha[i].x += this.lens[j].theta_e*this.scale*cosphi;
-                  this.alpha[i].y += this.lens[j].theta_e*this.scale*sinphi;
-	      }
-      }
-      
-	return this;
 }
 
 LensToy.prototype.copyToClipboard = function(){
@@ -305,28 +282,37 @@ LensToy.prototype.getCursor = function(e){
 	return this.cursor;
 }
 
-// A function that lets us attach functions to particular events
-LensToy.prototype.bind = function(ev,fn){
-	if(typeof ev!="string" || typeof fn!="function") return this;
-	if(this.events[ev]) this.events[ev].push(fn);
-	else this.events[ev] = [fn];
+// Attach a handler to an event for the Canvas object in a style similar to that used by jQuery
+// .bind(eventType[,eventData],handler(eventObject));
+// .bind("resize",function(e){ console.log(e); });
+// .bind("resize",{me:this},function(e){ console.log(e.data.me); });
+LensToy.prototype.bind = function(ev,e,fn){
+	if(typeof ev!="string") return this;
+	if(typeof fn==="undefined"){
+		fn = e;
+		e = {};
+	}else{
+		e = {data:e}
+	}
+	if(typeof e!="object" || typeof fn!="function") return this;
+	if(this.events[ev]) this.events[ev].push({e:e,fn:fn});
+	else this.events[ev] = [{e:e,fn:fn}];
 	return this;
 }
 
-// Trigger a defined event with arguments. This is meant for internal use to be 
+// Trigger a defined event with arguments. This is for internal-use to be
 // sure to include the correct arguments for a particular event
-// this.trigger("zoom",args)
 LensToy.prototype.trigger = function(ev,args){
 	if(typeof ev != "string") return;
 	if(typeof args != "object") args = {};
 	var o = [];
-	var _obj = this;
 	if(typeof this.events[ev]=="object"){
-		for(i = 0 ; i < this.events[ev].length ; i++){
-			if(typeof this.events[ev][i] == "function") o.push(this.events[ev][i].call(_obj,args))
+		for(var i = 0 ; i < this.events[ev].length ; i++){
+			var e = G.extend(this.events[ev][i].e,args);
+			if(typeof this.events[ev][i].fn == "function") o.push(this.events[ev][i].fn.call(this,e))
 		}
 	}
-	if(o.length > 0) return o
+	if(o.length > 0) return o;
 }
 
 
@@ -357,3 +343,25 @@ function getStyle(el, styleProp) {
 	if (style && style.length === 0) style = null;
 	return style;
 }
+
+// Extra mathematical/helper functions that will be useful - inspired by http://alexyoung.github.com/ico/
+var G = {};
+G.sum = function(a) { var i, sum; for (i = 0, sum = 0; i < a.length; sum += a[i++]) {}; return sum; };
+if (typeof Array.prototype.max === 'undefined') G.max = function(a) { return Math.max.apply({}, a); };
+else G.max = function(a) { return a.max(); };
+if (typeof Array.prototype.min === 'undefined') G.min = function(a) { return Math.min.apply({}, a); };
+else G.min = function(a) { return a.min(); };
+G.mean = function(a) { return G.sum(a) / a.length; };
+G.stddev = function(a) { return Math.sqrt(G.variance(a)); };
+G.log10 = function(v) { return Math.log(v)/2.302585092994046; };
+G.variance = function(a) { var mean = G.mean(a), variance = 0; for (var i = 0; i < a.length; i++) variance += Math.pow(a[i] - mean, 2); return variance / (a.length - 1); };
+if (typeof Object.extend === 'undefined') {
+	G.extend = function(destination, source) {
+		for (var property in source) {
+			if (source.hasOwnProperty(property)) destination[property] = source[property];
+		}
+		return destination;
+	};
+} else G.extend = Object.extend;
+
+
