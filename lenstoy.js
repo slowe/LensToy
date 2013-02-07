@@ -25,7 +25,7 @@ function LensToy(input){
 	
 	// and add its lens mass and source brightness components (units=arcseconds):
 	this.lens.add({plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0});
-	this.lens.add({plane: "lens", theta_e:  3.0, x:  7.0, y: -27.0});
+	this.lens.add({plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0});
 	this.lens.add({plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0});
 	this.lens.add({plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0});
 	this.lens.add({plane: "source", size:  1.25, x: 1000.0, y:  1000.0});
