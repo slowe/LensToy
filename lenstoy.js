@@ -12,60 +12,73 @@ function LensToy(input){
 
 	// Set some variables
 	this.id = (input && typeof input.id=="string") ? input.id : "LensToy";
-	this.src = (input && typeof input.src=="string") ? input.src : "";
 	this.width = (input && typeof input.width=="number") ? input.width : parseInt(getStyle(this.id, 'width'), 10);
 	this.height = (input && typeof input.height=="number") ? input.height : parseInt(getStyle(this.id, 'height'), 10);
-	// Each lens component has its own position, relative to the image center.
-      // this.xoff = (input && typeof input.xoff=="number") ? input.xoff : 0;	// Horizontal offset in original image pixels
-	// this.yoff = (input && typeof input.yoff=="number") ? input.yoff : 0;	// Vertical offset in original image pixels
-	this.events = {load:"",click:"",mousemove:""};	// Let's define some events
-	
-	// Create an instance of a lens,
-	this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
-	
-	// and add its lens mass and source brightness components (units=arcseconds):
-	this.lens.add({plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0});
-	this.lens.add({plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0});
-	this.lens.add({plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0});
-	this.lens.add({plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0});
-	this.lens.add({plane: "source", size:  1.25, x: 1000.0, y:  1000.0});
-
-	// Calculate the deflection angle vector field, alpha(x,y):
-	this.lens.calculateAlpha();
-
-	// Now use this to calculate the lensed image:
-	this.lens.calculateImage();
-
+	// DEPRECATED this.src = (input && typeof input.src=="string") ? input.src : "";
+	this.src = "";
+	this.events = {load:"",click:"",mousemove:"",init:""};	// Let's define some events
 	this.img = { complete: false };
 
+	// Setup our canvas etc
 	this.setup(this.id);
 
-	if(this.src) this.load(this.src);
+	// Create an instance of a lens,
+	this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
 
-	this.ctx.clearRect(0,0,this.width,this.height);
-	this.copyToClipboard();
+	this.models = new Array();
+	this.models.push({
+		name: 'Example',
+		src: "SL2SJ140156+554446_irg_100x100.png",
+		components: [
+			{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
+			{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
+			{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
+		],
+		events: {
+			mousemove: function(e){
+				var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+				var msg = "";
+				if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
+				if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
+				if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
+	
+				this.setStatus(this.model.name+': '+msg);
 
-	this.bind("mousemove",{lens:this.lens},function(e){
-
-		// Remove existing sources
-		this.lens.removeAll('source');
-
-		// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
-		var coords = this.lens.pix2ang({x:e.x, y:e.y});
-		this.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
-
-		// Paste original image
-		this.pasteFromClipboard();
-
-		// Re-calculate the lensed image
-		this.lens.calculateImage();
-
-		// Draw the lensed image on top
-		this.drawLensImage({ x: e.x, y:e.y });
-
+			}
+		}
+	});
+	this.models.push({
+		name: 'CFHTLS4',
+		src: "SL2SJ140156+554446_irg_100x100.png",
+		components: [
+			{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
+			{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
+			{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
+			{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
+			{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
+		],
+		events: {
+			mousemove: function(e){
+				var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+				var msg = "";
+				if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
+				if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
+				if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
+	
+				this.setStatus(msg);
+			}
+		}
 	});
 
+
+	this.init();
+
 }
+
+LensToy.prototype.setStatus = function(msg){
+	if(document.getElementById('status')) document.getElementById('status').innerHTML = msg;
+}
+
 LensToy.prototype.drawLensImage = function(source){
 
 	var imgData = this.ctx.createImageData(this.width, this.height);
@@ -200,10 +213,83 @@ LensToy.prototype.setup = function(id){
 	return this;
 }
 
+// Return a model by name
+LensToy.prototype.getModel = function(name){
+	if(typeof name==="string"){
+		for(var i = 0; i < this.models.length; i++){
+			if(this.models[i].name==name) return this.models[i];
+		}
+	}
+	// No match so return the first model
+	return this.models[0];
+}
+
+LensToy.prototype.init = function(inp,fnCallback){
+
+	this.model = this.getModel(inp);
+	
+	if(typeof this.model.src==="string"){
+		this.src = this.model.src;
+		this.load(this.src);
+	}
+
+	if(typeof this.model.components==="object"){
+		this.lens.removeAll('lens');
+		this.lens.removeAll('source');
+		for(var i = 0; i < this.model.components.length ; i++){
+			// Add all the lens mass and source brightness components (units=arcseconds):
+			this.lens.add(this.model.components[i]);
+		}
+
+		// Calculate the deflection angle vector field, alpha(x,y):
+		this.lens.calculateAlpha();
+
+		// Now use this to calculate the lensed image:
+		this.lens.calculateImage();
+	}
+
+	this.ctx.clearRect(0,0,this.width,this.height);
+	this.copyToClipboard();
+
+	// Reset mousemove events
+	this.events['mousemove'] = "";
+
+	// Bind main event common to all models
+	this.bind("mousemove",function(e){
+
+		// Remove existing sources
+		this.lens.removeAll('source');
+
+		// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
+		var coords = this.lens.pix2ang({x:e.x, y:e.y});
+		this.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
+
+		// Paste original image
+		this.pasteFromClipboard();
+
+		// Re-calculate the lensed image
+		this.lens.calculateImage();
+
+		// Draw the lensed image on top
+		this.drawLensImage({ x: e.x, y:e.y });
+
+	});
+	
+	// Bind the custom callback
+	if(this.model.events && this.model.events.mousemove && typeof this.model.events.mousemove==="function") this.bind("mousemove",this.model.events.mousemove);
+
+	if(typeof fnCallback=="function") fnCallback(this);
+	this.trigger("init");
+
+	return this;
+}
+
 // Loads the image file. You can provide a callback or have
 // already assigned one with .bind('load',function(){ })
 LensToy.prototype.load = function(source,fnCallback){
-	if(typeof source=="string") this.src = source;
+
+	if(typeof source==="string") this.src = source;
+
 	if(typeof this.src=="string"){
 
 		this.image = null
@@ -221,6 +307,7 @@ LensToy.prototype.load = function(source,fnCallback){
 		}
 		this.img.src = this.src;
 	}
+
 	return this;
 }
 
