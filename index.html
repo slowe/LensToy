@@ -14,11 +14,16 @@
 		var lens = new LensToy({id:'lenstoy',xoff:-0.2,yoff:-4.5});
 		
 		// Attach a function to the load event
-		// lens.bind("load",function(){
-		//     document.getElementById('status').innerHTML = "Loaded "+this.src;
-		// });
 		lens.bind("load",function(){
 			document.getElementById('status').innerHTML = "Try putting a faint blue galaxy behind these massive yellow ones...";
+		}).bind("mousemove",function(e){
+            var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+            var msg = "";
+            if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
+            if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
+            if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
+
+			document.getElementById('status').innerHTML = msg;
 		});
 		
 		// Load the image
