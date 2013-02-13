@@ -18,16 +18,17 @@
 		this.events = {load:"",loadimage:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};	// Let's define some events
 		this.img = { complete: false };
 		this.showcrit = false;
-		// Setup our buttons etc
-		this.setup();
-	
-	
+
 		this.paper = new Canvas({ 'id': 'lenstoy' });
+
 		this.width = this.paper.width;
 		this.height = this.paper.height;
 	
 		// Create an instance of a lens,
 		this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
+
+		// Setup our buttons etc
+		this.setup();
 	
 		this.models = new Array();
 		this.models.push({
@@ -241,6 +242,16 @@
 			_obj.showcrit = !_obj.showcrit;
 			_obj.update();
 		});
+		addEvent(this.paper.canvas,"mousemove",function(e){
+			var c = _obj.paper.getCursor(e);
+			_obj.trigger("mousemove",{x:c.x,y:c.y})
+		});
+		addEvent(this.paper.canvas,"mouseout",function(e){
+			_obj.trigger("mouseout")
+		});
+		addEvent(this.paper.canvas,"mouseover",function(e){
+			_obj.trigger("mouseover")
+		});
 	
 		return this;
 	}
@@ -316,15 +327,17 @@
 		var ev = "";
 		for(var i = 0; i < e.length; i++){
 
-			// Zap any existing events
-			this.events[e[i]] = "";
-			this.paper.events[e[i]] = "";
-
 			if(this.model.events[e[i]] && typeof this.model.events[e[i]]==="function") ev = this.model.events[e[i]];
 			else ev = "";
 
-			if(e[i] == "mousemove") this.paper.bind(e[i],{ev:ev,toy:this},function(e){ e.data.toy.update(e); });
-			this.bind(e[i],ev);
+			if(typeof ev==="function"){
+				// Zap any existing events
+				this.events[e[i]] = "";
+				this.paper.events[e[i]] = "";
+
+				if(e[i] == "mousemove") this.paper.bind(e[i],{ev:ev,toy:this},function(e){ e.data.toy.update(e); });
+				this.bind(e[i],ev);
+			}
 		}
 	
 		if(typeof fnCallback=="function") fnCallback(this);

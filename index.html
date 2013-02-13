@@ -13,19 +13,19 @@
 	window.onload = function(e){ 
 
 		// Create a FITS object. The ID is that of the <div>
-		var lens = new LensToy({id:'lenstoy'});
+		var toy = new LensToy({id:'lenstoy'});
 		
 		var offmsg = "Try putting a small blue galaxy behind these massive yellow ones...";
 		
         // Attach a function to the load event
-		lens.bind("mouseout",function(){
+		toy.bind("mouseout",function(){
 			this.setStatus(offmsg);
 		}).bind("loadimage",function(){
 			this.setStatus(offmsg);
 		});
         
 		// Load a particular model
-		lens.init('CFHTLS4');
+		toy.init('CFHTLS4');
 		//lens.init();
 
 	}
