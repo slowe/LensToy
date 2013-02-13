@@ -13,10 +13,13 @@
 		// Create a FITS object. The ID is that of the <div>
 		var lens = new LensToy({id:'lenstoy',xoff:-0.2,yoff:-4.5});
 		
+		var offmsg = "Try putting a faint blue galaxy behind these massive yellow ones...";
 		// Attach a function to the load event
-		lens.bind("load",function(){
-			document.getElementById('status').innerHTML = "Try putting a faint blue galaxy behind these massive yellow ones...";
-		})
+		lens.bind("mouseout",function(){
+			this.setStatus(offmsg);
+		}).bind("load",function(){
+			this.setStatus(offmsg);
+		});
 		
 		// Load a particular model
 		//lens.init('CFHTLS4');
@@ -39,7 +42,7 @@
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
 	#main { position: relative; height:420px; }
-	#status { margin-bottom: 0.5em; }
+	#status { margin-bottom: 0.5em; height: 1em; }
 	#lenstoy, #lensimg { width:400px; height:400px; }
 	#forkme_banner {
 		background: url("http://slowe.github.com/graph/images/blacktocat.png") no-repeat scroll 95% 50% #0090FF;

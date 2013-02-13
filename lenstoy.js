@@ -16,7 +16,7 @@ function LensToy(input){
 	this.height = (input && typeof input.height=="number") ? input.height : parseInt(getStyle(this.id, 'height'), 10);
 	// DEPRECATED this.src = (input && typeof input.src=="string") ? input.src : "";
 	this.src = "";
-	this.events = {load:"",click:"",mousemove:"",init:""};	// Let's define some events
+	this.events = {load:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};	// Let's define some events
 	this.img = { complete: false };
 
 	// Setup our canvas etc
@@ -41,9 +41,7 @@ function LensToy(input){
 				if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
 				if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
 				if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
-	
 				this.setStatus(this.model.name+': '+msg);
-
 			}
 		}
 	});
@@ -209,6 +207,14 @@ LensToy.prototype.setup = function(id){
 		_obj.getCursor(e);
 		_obj.trigger("mousemove",{x:_obj.cursor.x,y:_obj.cursor.y})
 	});
+	addEvent(this.canvas,"mouseout",function(e){
+		_obj.getCursor(e);
+		_obj.trigger("mouseout",{})
+	});
+	addEvent(this.canvas,"mouseover",function(e){
+		_obj.getCursor(e);
+		_obj.trigger("mouseover",{})
+	});
 
 	return this;
 }
@@ -275,8 +281,13 @@ LensToy.prototype.init = function(inp,fnCallback){
 
 	});
 	
-	// Bind the custom callback
-	if(this.model.events && this.model.events.mousemove && typeof this.model.events.mousemove==="function") this.bind("mousemove",this.model.events.mousemove);
+	// Bind the custom callback events
+	if(this.model.events){
+		var e = ["mousemove","mouseover","mouseout"];
+		for(var i = 0; i < e.length; i++){
+			if(this.model.events[e[i]] && typeof this.model.events[e[i]]==="function") this.bind(e[i],this.model.events[e[i]]);
+		}
+	}
 
 	if(typeof fnCallback=="function") fnCallback(this);
 	this.trigger("init");
