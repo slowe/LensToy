@@ -25,9 +25,11 @@ function LensToy(input){
 
 	// Create an instance of a lens,
 	this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
-
+ 
+    // List of examples - add your own here!
 	this.models = new Array();
-	this.models.push({
+	
+    this.models.push({
 		name: 'Example',
 		src: "SL2SJ140156+554446_irg_100x100.png",
 		components: [
@@ -35,7 +37,8 @@ function LensToy(input){
 			{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
 			{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
 		],
-		events: {
+		/* This seems to significantly slow down the toy... and progressively so!
+        events: {
 			mousemove: function(e){
 				var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
 				var msg = "";
@@ -45,6 +48,7 @@ function LensToy(input){
 				this.setStatus(this.model.name+': '+msg);
 			}
 		}
+        */
 	});
 	this.models.push({
 		name: 'CFHTLS4',
@@ -56,6 +60,7 @@ function LensToy(input){
 			{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
 			{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
 		],
+		/* This seems to significantly slow down the toy... and progressively so!
 		events: {
 			mousemove: function(e){
 				var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
@@ -67,6 +72,7 @@ function LensToy(input){
 				this.setStatus(msg);
 			}
 		}
+        */
 	});
 
 
@@ -143,9 +149,9 @@ LensToy.prototype.drawLensImage = function(source){
 		// Add to blue channel
 		imgData.data[pos+2] = c[2];
 
-		// Alpha channel
-		// MAGIC number 0.1, trades off with blur steps...
-		imgData.data[pos+3] = Math.round(0.1*255)*this.lens.predictedimage[i];
+		// Alpha channel - arc brightness.
+		// MAGIC number 0.1, trades off with blur steps... Math.round(0.2*255) ~50 
+		imgData.data[pos+3] = 50*this.lens.predictedimage[i];
 
 		pos += 4;
 	}
@@ -171,8 +177,8 @@ LensToy.prototype.drawLensImage = function(source){
 LensToy.prototype.blur = function(imageData){
 	//return this.convolve(imageData, this.kernel);
 
-	var steps = 5;
-      // Kernel width 0.9", trades off with alpha channel...
+	var steps = 3;
+    // Kernel width 0.9", trades off with alpha channel...
 	var smallW = Math.round(this.width / this.scale);
 	var smallH = Math.round(this.height / this.scale);
 
@@ -188,10 +194,10 @@ LensToy.prototype.blur = function(imageData){
 	var copyCtx = copy.getContext("2d");
 
 	// Convolution with square top hat kernel, by shifting and redrawing image...
-      // Does not get brightness quite right...
-      for (var i=0;i<steps;i++) {
-		var scaledW = Math.max(1,Math.round(smallW - i));
-		var scaledH = Math.max(1,Math.round(smallH - i));
+    // Does not get brightness quite right...
+    for (var i=0;i<steps;i++) {
+		var scaledW = Math.max(1,Math.round(smallW - 2*i));
+		var scaledH = Math.max(1,Math.round(smallH - 2*i));
 
 		copyCtx.clearRect(0,0,smallW,smallH);
 		copyCtx.drawImage(canvas,0,0,this.width,this.height,0,0,scaledW,scaledH);
