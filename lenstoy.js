@@ -10,126 +10,6 @@
 (function(exports) {
 	exports.LensToy = LensToy;
 
-<<<<<<< HEAD
-// First we will create the basic function
-function LensToy(input){
-
-	// Set some variables
-	this.id = (input && typeof input.id=="string") ? input.id : "LensToy";
-	this.width = (input && typeof input.width=="number") ? input.width : parseInt(getStyle(this.id, 'width'), 10);
-	this.height = (input && typeof input.height=="number") ? input.height : parseInt(getStyle(this.id, 'height'), 10);
-	// DEPRECATED this.src = (input && typeof input.src=="string") ? input.src : "";
-	this.src = "";
-	this.events = {load:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};	// Let's define some events
-	this.img = { complete: false };
-	this.showcrit = false;
-
-	// Setup our canvas etc
-	this.setup(this.id);
-
-	// Create an instance of a lens,
-	this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
- 
-    // List of examples - add your own here!
-	this.models = new Array();
-	
-    this.models.push({
-		name: 'Example',
-		src: "SL2SJ140156+554446_irg_100x100.png",
-		components: [
-			{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
-			{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
-			{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
-		],
-		/* This seems to significantly slow down the toy... and progressively so!
-        events: {
-			mousemove: function(e){
-				var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
-				var msg = "";
-				if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
-				if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
-				if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
-				this.setStatus(this.model.name+': '+msg);
-			}
-		}
-        */
-	});
-	this.models.push({
-		name: 'CFHTLS4',
-		src: "SL2SJ140156+554446_irg_100x100.png",
-		components: [
-			{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
-			{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
-			{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
-			{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
-			{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
-		],
-		/* This seems to significantly slow down the toy... and progressively so!
-		events: {
-			mousemove: function(e){
-				var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
-				var msg = "";
-				if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
-				if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
-				if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
-	
-				this.setStatus(msg);
-			}
-		}
-        */
-	});
-
-
-	this.init();
-
-}
-
-// Contour using conrec.js
-LensToy.prototype.contour = function(data,z){
-	// data should be a 2D array
-
-	var c = new Conrec();
-
-	// Check inputs
-	if(typeof data!=="object") return c;
-	if(typeof z!=="object") return c;
-	if(data.length < 1) return c;
-	if(data[0].length < 1) return c;
-
-	var ilb = 0;
-	var iub = data.length-1;
-	var jlb = 0;
-	var jub = data[0].length-1;
-	var idx = new Array(data.length);
-	var jdx = new Array(data[0].length);
-	for(var i = 0 ; i < idx.length ; i++) idx[i] = i+1;
-	for(var j = 0 ; j < jdx.length ; j++) jdx[j] = j+1;
-
-	// contour(d, ilb, iub, jlb, jub, x, y, nc, z)
-	// d               ! matrix of data to contour
-	// ilb,iub,jlb,jub ! index bounds of data matrix
-	// x               ! data matrix column coordinates
-	// y               ! data matrix row coordinates
-	// nc              ! number of contour levels
-	// z               ! contour levels in increasing order
-	c.contour(data, ilb, iub, jlb, jub, idx, jdx, z.length, z);
-	return c;
-}
-
-LensToy.prototype.drawContours = function(c,opt){
-	if(c.length < 1) return;
-	var color = (opt && typeof opt.color==="string") ? opt.color : '#FFFFFF';
-	var i, j, l;
-	this.ctx.strokeStyle = color;
-	for(l = 0; l < c.length ; l++){
-		this.ctx.beginPath();
-		// Move to the start of this contour
-		this.ctx.moveTo(c[l][0].x,c[l][0].y);
-		// Join the dots
-		for(i = 1; i < c[l].length ; i++) this.ctx.lineTo(c[l][i].x,c[l][i].y);
-		this.ctx.closePath();
-		this.ctx.stroke();
-=======
 	// First we will create the basic function
 	function LensToy(input){
 	
@@ -195,76 +75,8 @@ LensToy.prototype.drawContours = function(c,opt){
 	
 		this.init();
 	
->>>>>>> Refactoring
 	}
 	
-<<<<<<< HEAD
-	// Loop over the kappa map
-	for(var i = 0; i < this.width*this.height ; i++){
-
-		// Add to red channel
-		imgData.data[pos+0] = c[0];
-
-		// Add to green channel
-		imgData.data[pos+1] = c[1];
-
-		// Add to blue channel
-		imgData.data[pos+2] = c[2];
-
-		// Alpha channel - arc brightness.
-		// MAGIC number 0.1, trades off with blur steps... Math.round(0.2*255) ~50 
-		imgData.data[pos+3] = 50*this.lens.predictedimage[i];
-
-		pos += 4;
-	}
-
-	// Blur the image
-	imgData = this.blur(imgData);
-
-
-	// Because of the way putImageData replaces all the pixel values, 
-	// we have to create a temporary canvas and put it there.
-	var overlayCanvas = document.createElement("canvas");
-	overlayCanvas.width = this.width;
-	overlayCanvas.height = this.height;
-	overlayCanvas.getContext("2d").putImageData(imgData, 0, 0);
-
-	// Now we can combine the new image with our existing canvas
-	// whilst preserving transparency
-	this.ctx.drawImage(overlayCanvas, 0, 0);
-      
-      // This procedure includes some interpolation on to the larger canvas, preventing us seeing the pixels...
-}
-
-LensToy.prototype.blur = function(imageData){
-	//return this.convolve(imageData, this.kernel);
-
-	var steps = 3;
-    // Kernel width 0.9", trades off with alpha channel...
-	var smallW = Math.round(this.width / this.scale);
-	var smallH = Math.round(this.height / this.scale);
-
-	var canvas = document.createElement("canvas");
-	canvas.width = this.width;
-	canvas.height = this.height;
-	var ctx = canvas.getContext("2d");
-	ctx.putImageData(imageData,0,0);
-
-	var copy = document.createElement("canvas");
-	copy.width = smallW;
-	copy.height = smallH;
-	var copyCtx = copy.getContext("2d");
-
-	// Convolution with square top hat kernel, by shifting and redrawing image...
-    // Does not get brightness quite right...
-    for (var i=0;i<steps;i++) {
-		var scaledW = Math.max(1,Math.round(smallW - 2*i));
-		var scaledH = Math.max(1,Math.round(smallH - 2*i));
-
-		copyCtx.clearRect(0,0,smallW,smallH);
-		copyCtx.drawImage(canvas,0,0,this.width,this.height,0,0,scaledW,scaledH);
-		ctx.drawImage(copy,0,0,scaledW,scaledH,0,0,this.width,this.height);
-=======
 	// Contour using conrec.js
 	LensToy.prototype.getContours = function(data,z){
 		// data should be a 2D array
@@ -313,7 +125,6 @@ LensToy.prototype.blur = function(imageData){
 		}
 		
 		return this;
->>>>>>> Refactoring
 	}
 	
 	// We are going to keep the lens.js library independent of 
