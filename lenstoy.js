@@ -18,6 +18,7 @@ function LensToy(input){
 	this.src = "";
 	this.events = {load:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};	// Let's define some events
 	this.img = { complete: false };
+	this.showcrit = false;
 
 	// Setup our canvas etc
 	this.setup(this.id);
@@ -73,6 +74,53 @@ function LensToy(input){
 
 }
 
+// Contour using conrec.js
+LensToy.prototype.contour = function(data,z){
+	// data should be a 2D array
+
+	var c = new Conrec();
+
+	// Check inputs
+	if(typeof data!=="object") return c;
+	if(typeof z!=="object") return c;
+	if(data.length < 1) return c;
+	if(data[0].length < 1) return c;
+
+	var ilb = 0;
+	var iub = data.length-1;
+	var jlb = 0;
+	var jub = data[0].length-1;
+	var idx = new Array(data.length);
+	var jdx = new Array(data[0].length);
+	for(var i = 0 ; i < idx.length ; i++) idx[i] = i+1;
+	for(var j = 0 ; j < jdx.length ; j++) jdx[j] = j+1;
+
+	// contour(d, ilb, iub, jlb, jub, x, y, nc, z)
+	// d               ! matrix of data to contour
+	// ilb,iub,jlb,jub ! index bounds of data matrix
+	// x               ! data matrix column coordinates
+	// y               ! data matrix row coordinates
+	// nc              ! number of contour levels
+	// z               ! contour levels in increasing order
+	c.contour(data, ilb, iub, jlb, jub, idx, jdx, z.length, z);
+	return c;
+}
+
+LensToy.prototype.drawContours = function(c,opt){
+	if(c.length < 1) return;
+	var color = (opt && typeof opt.color==="string") ? opt.color : '#FFFFFF';
+	var i, j, l;
+	this.ctx.strokeStyle = color;
+	for(l = 0; l < c.length ; l++){
+		this.ctx.beginPath();
+		// Move to the start of this contour
+		this.ctx.moveTo(c[l][0].x,c[l][0].y);
+		// Join the dots
+		for(i = 1; i < c[l].length ; i++) this.ctx.lineTo(c[l][i].x,c[l][i].y);
+		this.ctx.closePath();
+		this.ctx.stroke();
+	}
+}
 LensToy.prototype.setStatus = function(msg){
 	if(document.getElementById('status')) document.getElementById('status').innerHTML = msg;
 }
@@ -208,12 +256,17 @@ LensToy.prototype.setup = function(id){
 		_obj.trigger("mousemove",{x:_obj.cursor.x,y:_obj.cursor.y})
 	});
 	addEvent(this.canvas,"mouseout",function(e){
-		_obj.getCursor(e);
 		_obj.trigger("mouseout",{})
 	});
 	addEvent(this.canvas,"mouseover",function(e){
-		_obj.getCursor(e);
 		_obj.trigger("mouseover",{})
+	});
+
+	this.buttons = { crit: document.getElementById('criticalcurve') };
+	
+	addEvent(this.buttons.crit,"click",function(e){
+		_obj.showcrit = !_obj.showcrit;
+		_obj.update();
 	});
 
 	return this;
@@ -261,25 +314,7 @@ LensToy.prototype.init = function(inp,fnCallback){
 	this.events['mousemove'] = "";
 
 	// Bind main event common to all models
-	this.bind("mousemove",function(e){
-
-		// Remove existing sources
-		this.lens.removeAll('source');
-
-		// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
-		var coords = this.lens.pix2ang({x:e.x, y:e.y});
-		this.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
-
-		// Paste original image
-		this.pasteFromClipboard();
-
-		// Re-calculate the lensed image
-		this.lens.calculateImage();
-
-		// Draw the lensed image on top
-		this.drawLensImage({ x: e.x, y:e.y });
-
-	});
+	this.bind("mousemove",function(e){ this.update(e); });
 	
 	// Bind the custom callback events
 	if(this.model.events){
@@ -293,6 +328,40 @@ LensToy.prototype.init = function(inp,fnCallback){
 	this.trigger("init");
 
 	return this;
+}
+
+LensToy.prototype.update = function(e){
+	// Remove existing sources
+	this.lens.removeAll('source');
+
+	if(!e) e = { x : 1000, y: 1000 }
+	// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
+	var coords = this.lens.pix2ang({x:e.x, y:e.y});
+	this.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
+
+	// Paste original image
+	this.pasteFromClipboard();
+
+	// Re-calculate the lensed image
+	this.lens.calculateImage();
+
+	// Draw the lensed image on top
+	this.drawLensImage({ x: e.x, y:e.y });
+
+	// Calculate and overlay arcs outline:
+	if(typeof Conrec==="function" && this.showcrit){
+		var i, row, col;
+		var arr = new Array(this.lens.h);
+		for(row = 0 ; row < this.lens.h ; row++){
+			arr[row] = new Array(this.lens.w);
+			for(col = 0 ; col < this.lens.w ; col++){
+				i = row + col*this.lens.h;
+				arr[row][col] = this.lens.mag[i].inverse;
+			}
+		}
+		var lasso = this.contour(arr,[0.0]);
+		this.drawContours(lasso.contourList(), {color:'#77FF77'});
+	}
 }
 
 // Loads the image file. You can provide a callback or have

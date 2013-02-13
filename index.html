@@ -3,8 +3,9 @@
 <head>
 	<meta charset='utf-8' />
 	<title>LensToy</title>
-	<script src="https://raw.github.com/slowe/lensjs/master/lens.js"></script>
-	<script src="lenstoy.js"></script>
+	<script type="text/javascript" src="https://raw.github.com/slowe/lensjs/master/lens.js"></script>
+	<script type="text/javascript" src="https://raw.github.com/jasondavies/conrec.js/master/conrec.js"></script>
+	<script type="text/javascript" src="lenstoy.js"></script>
 	<!--[if lt IE 9]><script src="excanvas.min.js"></script><![endif]-->
 	<script type="text/javascript">
 
@@ -21,9 +22,10 @@
 			this.setStatus(offmsg);
 		});
 		
+		
 		// Load a particular model
-		//lens.init('CFHTLS4');
-		lens.init();
+		lens.init('CFHTLS4');
+		//lens.init();
 
 	}
 	</script>
@@ -42,7 +44,7 @@
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
 	#main { position: relative; height:420px; }
-	#status { margin-bottom: 0.5em; height: 1em; }
+	#status { margin-bottom: 0.5em; height: 1em; margin-bottom: 1em; }
 	#lenstoy, #lensimg { width:400px; height:400px; }
 	#forkme_banner {
 		background: url("http://slowe.github.com/graph/images/blacktocat.png") no-repeat scroll 95% 50% #0090FF;
@@ -73,11 +75,13 @@
 		</header>
 	
 		<div id="status">Loading image...</div>
-		<br>
 		<div id="main">
 			<!-- <img src="simarc1.png" id="lensimg" style="z-index:1;position:absolute;"/> -->
 			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
 			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
+		</div>
+		<div id="options">
+			<button id="criticalcurve">Toggle Critical Curves</button>
 		</div>
 	
 		<p align="left"><font size=-1><a href="https://github.com/slowe/LensToy">https://github.com/slowe/LensToy</a></p>
