@@ -4,6 +4,7 @@
 	<meta charset='utf-8' />
 	<title>LensToy</title>
 	<script type="text/javascript" src="https://raw.github.com/slowe/lensjs/master/lens.js"></script>
+	<script type="text/javascript" src="https://raw.github.com/slowe/lensjs/master/canvas.js"></script>
 	<script type="text/javascript" src="https://raw.github.com/jasondavies/conrec.js/master/conrec.js"></script>
 	<script type="text/javascript" src="lenstoy.js"></script>
 	<!--[if lt IE 9]><script src="excanvas.min.js"></script><![endif]-->
@@ -12,14 +13,14 @@
 	window.onload = function(e){ 
 
 		// Create a FITS object. The ID is that of the <div>
-		var lens = new LensToy({id:'lenstoy',xoff:-0.2,yoff:-4.5});
+		var lens = new LensToy({id:'lenstoy'});
 		
 		var offmsg = "Try putting a small blue galaxy behind these massive yellow ones...";
 		
         // Attach a function to the load event
 		lens.bind("mouseout",function(){
 			this.setStatus(offmsg);
-		}).bind("load",function(){
+		}).bind("loadimage",function(){
 			this.setStatus(offmsg);
 		});
         
