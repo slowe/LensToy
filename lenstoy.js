@@ -14,12 +14,12 @@
 	function LensToy(input){
 	
 		// Set some variables
-		this.id = (input && typeof input.id=="string") ? input.id : "LensToy";
+		this.id = (input && typeof input.id=="string") ? input.id : "lenstoy";
 		this.events = {load:"",loadimage:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};	// Let's define some events
 		this.img = { complete: false };
 		this.showcrit = false;
 
-		this.paper = new Canvas({ 'id': 'lenstoy' });
+		this.paper = new Canvas({ 'id': this.id });
 
 		this.width = this.paper.width;
 		this.height = this.paper.height;
