@@ -238,10 +238,12 @@
 	
 		this.buttons = { crit: document.getElementById('criticalcurve') };
 		var _obj = this;
-		addEvent(this.buttons.crit,"click",function(e){
-			_obj.showcrit = !_obj.showcrit;
-			_obj.update();
-		});
+		if(this.buttons.crit){
+			addEvent(this.buttons.crit,"click",function(e){
+				_obj.showcrit = !_obj.showcrit;
+				_obj.update();
+			});
+		}
 		addEvent(this.paper.canvas,"mousemove",function(e){
 			var c = _obj.paper.getCursor(e);
 			_obj.trigger("mousemove",{x:c.x,y:c.y})
