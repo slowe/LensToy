@@ -14,12 +14,12 @@
 	function LensToy(input){
 	
 		// Set some variables
-		this.id = (input && typeof input.id=="string") ? input.id : "LensToy";
+		this.id = (input && typeof input.id=="string") ? input.id : "lenstoy";
 		this.events = {load:"",loadimage:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};	// Let's define some events
 		this.img = { complete: false };
 		this.showcrit = false;
 
-		this.paper = new Canvas({ 'id': 'lenstoy' });
+		this.paper = new Canvas({ 'id': this.id });
 
 		this.width = this.paper.width;
 		this.height = this.paper.height;
@@ -281,10 +281,12 @@
 	
 		this.buttons = { crit: document.getElementById('criticalcurve') };
 		var _obj = this;
-		addEvent(this.buttons.crit,"click",function(e){
-			_obj.showcrit = !_obj.showcrit;
-			_obj.update();
-		});
+		if(this.buttons.crit){
+			addEvent(this.buttons.crit,"click",function(e){
+				_obj.showcrit = !_obj.showcrit;
+				_obj.update();
+			});
+		}
 		addEvent(this.paper.canvas,"mousemove",function(e){
 			var c = _obj.paper.getCursor(e);
 			_obj.trigger("mousemove",{x:c.x,y:c.y})
@@ -476,6 +478,7 @@
 	// Cross-browser way to add an event
 	if(typeof addEvent!="function"){
 		function addEvent(oElement, strEvent, fncHandler){
+			if(!oElement) { console.log(oElement); return; }
 			if(oElement.addEventListener) oElement.addEventListener(strEvent, fncHandler, false);
 			else if(oElement.attachEvent) oElement.attachEvent("on" + strEvent, fncHandler);
 		}
