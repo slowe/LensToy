@@ -25,7 +25,7 @@
 		});
         
 		// Load a particular model
-		toy.init('CFHTLS4');
+		toy.init('Example');
 		//lens.init();
 
 	}
@@ -45,8 +45,8 @@
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
 	#main { position: relative; height:420px; cursor: crosshair; }
-	#status { margin-bottom: 0.5em; height: 1em; margin-bottom: 1em; }
-	#lenstoy, #lensimg { width:400px; height:400px; }
+	#status { width:420px; margin-bottom: 0.5em; height: 1em; margin-bottom: 1em; }
+	#lenstoy, #lensimg { position: relative; top:10px; width:400px; height:400px; }
 	#forkme_banner {
 		background: url("http://slowe.github.com/graph/images/blacktocat.png") no-repeat scroll 95% 50% #0090FF;
 		border-bottom-left-radius: 2px;
@@ -77,8 +77,7 @@
 	
 		<div id="status">Loading image...</div>
 		<div id="main">
-			<!-- <img src="simarc1.png" id="lensimg" style="z-index:1;position:absolute;"/> -->
-			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
+			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:10;position:absolute;"/>
 			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
 		</div>
 		<div id="options">

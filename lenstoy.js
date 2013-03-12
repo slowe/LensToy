@@ -37,22 +37,24 @@
 			components: [
 				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
 				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
+				{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
+				{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
 				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
 			],
 			events: {
 				mousemove: function(e){
 					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
 					var msg = "";
-					if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
-					if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
-					if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
+					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
+					if(k >= 0.4 && k < 0.7) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
+					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
 					this.setStatus(this.model.name+': '+msg);
 				}
 			}
 		});
 		this.models.push({
-			name: 'CFHTLS4',
-			src: "SL2SJ140156+554446_irg_100x100.png",
+			name: 'CFHTLS_field',
+			src: "CFHTLS_field_440x440.png",
 			components: [
 				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
 				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
@@ -64,10 +66,51 @@
 				mousemove: function(e){
 					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
 					var msg = "";
-					if(k < 0.2) msg = "Out here the image of the source is only being weakly lensed";
-					if(k >= 0.2 && k < 0.5) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
-					if(k >= 0.5) msg = "The source is right behind the lens now - and is being multiply-imaged";
-		
+					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
+					if(k >= 0.4 && k < 0.7) msg = "The space around those massive yellow galaxies is being warped, distorting the image of the source";
+					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
+					this.setStatus(msg);
+				}
+			}
+		});
+		this.models.push({
+			name: 'CFHTLS_group',
+			src: "CFHTLS_group_220x220.png",
+			components: [
+				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
+				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
+				{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
+				{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
+				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
+			],
+			events: {
+				mousemove: function(e){
+					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+					var msg = "";
+					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
+					if(k >= 0.4 && k < 0.7) msg = "The space around those massive yellow galaxies is being warped, distorting the image of the source";
+					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
+					this.setStatus(msg);
+				}
+			}
+		});
+		this.models.push({
+			name: 'CFHTLS_galaxy',
+			src: "CFHTLS_galaxy_110x110.png",
+			components: [
+				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
+				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
+				{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
+				{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
+				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
+			],
+			events: {
+				mousemove: function(e){
+					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+					var msg = "";
+					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
+					if(k >= 0.4 && k < 0.7) msg = "The space around this massive yellow galaxy is being warped, distorting the image of the source";
+					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
 					this.setStatus(msg);
 				}
 			}
@@ -206,8 +249,8 @@
 				// MAGIC number 0.01 -> Math.round(255*0.01) = 3
 				imgData.data[pos+3] = 3/Math.abs(lens.mag[i].inverse);
 			}else if(mode == "image"){
-				// MAGIC number 0.1, trades off with blur steps... -> Math.round(255*0.1) = 26
-				imgData.data[pos+3] = 26*lens.predictedimage[i];
+				// MAGIC number 0.1, trades off with blur steps... -> Math.round(255*0.2) ~ 50
+				imgData.data[pos+3] = 50*lens.predictedimage[i];
 			}else{
 				imgData.data[pos+3] = 255;
 			}
