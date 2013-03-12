@@ -13,32 +13,49 @@
 	// First we will create the basic function
 	function LensToy(input){
 	
-		// Set some variables
+        // Set some variables based on the inputs:
 		this.id = (input && typeof input.id=="string") ? input.id : "lenstoy";
-		this.events = {load:"",loadimage:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};	// Let's define some events
+		this.pixscale = (input && typeof input.pixscale=="number") ? input.pixscale : 1.0;
+        
+		// Set up the canvas for drawing the model image etc:
+		this.paper = new Canvas({ 'id': this.id });
+        // Get the canvas width and height:
+		this.width = this.paper.width;
+		this.height = this.paper.height;
+        
+        // Let's define some events
+        this.events = {load:"",loadimage:"",click:"",mousemove:"",mouseout:"",mouseover:"",init:""};
 		this.img = { complete: false };
 		this.showcrit = false;
 
-		this.paper = new Canvas({ 'id': this.id });
-
-		this.width = this.paper.width;
-		this.height = this.paper.height;
 	
-		// Create an instance of a lens,
-		this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
+		// Create an instance of a lens:
+		// Example:
+        // this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.25});
+		// CFHTLS_field:
+		// this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.186});
+		// CFHTLS_group:
+		// this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale':0.186/2.0});
+		// CFHTLS_galaxy:
+		this.lens = new Lens({ 'width': this.width, 'height': this.height, 'pixscale': this.pixscale});
 
 		// Setup our buttons etc
 		this.setup();
 	
+        // The possible lens models!
+        // NB. It would be good to be able to define the PSFwidth here, and pass it down to the 
+        // canvas routines so that the PSF blurring is well-emulated.
+ 
 		this.models = new Array();
 		this.models.push({
 			name: 'Example',
 			src: "SL2SJ140156+554446_irg_100x100.png",
+            PSFwidth: 1.2,
 			components: [
 				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
-				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
-				{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
-				{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
+				{plane: "lens", theta_e:  3.0, x: -7.0, y:  27.0},
+				{plane: "lens", theta_e:  3.0, x: 37.0, y: -37.0},
+				{plane: "lens", theta_e:  3.0, x: 17.0, y: -52.0},
 				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
 			],
 			events: {
@@ -55,12 +72,17 @@
 		this.models.push({
 			name: 'CFHTLS_field',
 			src: "CFHTLS_field_440x440.png",
+            PSFwidth: 0.8,
 			components: [
-				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
-				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
-				{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
-				{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
-				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
+				{plane: "lens", theta_e: 1.3, x: -28.3, y: -17.3},
+				{plane: "lens", theta_e: 1.3, x:   3.5, y:  35.5},
+				{plane: "lens", theta_e: 3.0, x:   4.1, y:  17.9},
+				{plane: "lens", theta_e: 1.3, x:  14.9, y:  26.4},
+				{plane: "lens", theta_e: 1.0, x:  -1.7, y:  12.1},
+				{plane: "lens", theta_e: 1.0, x: -15.1, y:  12.3},
+				{plane: "lens", theta_e: 1.3, x: -13.9, y: -35.5},
+				{plane: "lens", theta_e: 1.0, x:  24.9, y: -25.1},
+				{plane: "source", size:  0.7, x: 1000.0, y:  1000.0}
 			],
 			events: {
 				mousemove: function(e){
@@ -69,6 +91,8 @@
 					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
 					if(k >= 0.4 && k < 0.7) msg = "The space around those massive yellow galaxies is being warped, distorting the image of the source";
 					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
+					var t = this.lens.pix2ang({x:e.x, y:e.y});
+                    msg = msg+". Cursor position = "+(t.x.toFixed(1))+","+(t.y.toFixed(1));
 					this.setStatus(msg);
 				}
 			}
@@ -76,12 +100,14 @@
 		this.models.push({
 			name: 'CFHTLS_group',
 			src: "CFHTLS_group_220x220.png",
+            PSFwidth: 0.8,
 			components: [
-				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
-				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
-				{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
-				{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
-				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
+				{plane: "lens", theta_e: 3.0, x:   0.4, y:  -0.5},
+				{plane: "lens", theta_e: 1.3, x: -18.8, y:  -6.2},
+				{plane: "lens", theta_e: 1.3, x:  -0.5, y:  17.1},
+				{plane: "lens", theta_e: 1.3, x:  11.1, y:   8.0},
+				{plane: "lens", theta_e: 1.0, x:  -5.5, y:  -6.4},
+                {plane: "source", size:  0.7, x: 1000.0, y:  1000.0}
 			],
 			events: {
 				mousemove: function(e){
@@ -90,6 +116,8 @@
 					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
 					if(k >= 0.4 && k < 0.7) msg = "The space around those massive yellow galaxies is being warped, distorting the image of the source";
 					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
+					var t = this.lens.pix2ang({x:e.x, y:e.y});
+                    msg = msg+". Cursor position = "+(t.x.toFixed(1))+","+(t.y.toFixed(1));
 					this.setStatus(msg);
 				}
 			}
@@ -97,12 +125,11 @@
 		this.models.push({
 			name: 'CFHTLS_galaxy',
 			src: "CFHTLS_galaxy_110x110.png",
+            PSFwidth: 0.8,
 			components: [
-				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
-				{plane: "lens", theta_e:  3.0, x:  -7.0, y: -27.0},
-				{plane: "lens", theta_e:  3.0, x: 37.0, y:  37.0},
-				{plane: "lens", theta_e:  3.0, x: 17.0, y:  52.0},
-				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
+				{plane: "lens", theta_e: 1.3, x: -0.3, y:   0.6},
+				{plane: "lens", theta_e: 0.1, x:  7.4, y:   0.1},
+				{plane: "source", size:  0.7, x: 1000.0, y:  1000.0}
 			],
 			events: {
 				mousemove: function(e){
@@ -111,6 +138,8 @@
 					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
 					if(k >= 0.4 && k < 0.7) msg = "The space around this massive yellow galaxy is being warped, distorting the image of the source";
 					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
+					var t = this.lens.pix2ang({x:e.x, y:e.y});
+                    msg = msg+". Cursor position = "+(t.x.toFixed(1))+","+(t.y.toFixed(1));
 					this.setStatus(msg);
 				}
 			}
@@ -208,7 +237,9 @@
 		// The RGB colours
 		if(mode == "lens") c = [60, 60, 60];
 		else if(mode == "mag") c = [0, 120, 0];
-		else if(mode == "image") c = [195, 215, 255];
+		// else if(mode == "image") c = [195, 215, 255];
+		// Better color for CFHTLS examples:
+        else if(mode == "image") c = [115, 185, 255];
 	
 		// We just want to draw sources		
 		if(mode == "source"){
@@ -250,7 +281,9 @@
 				imgData.data[pos+3] = 3/Math.abs(lens.mag[i].inverse);
 			}else if(mode == "image"){
 				// MAGIC number 0.1, trades off with blur steps... -> Math.round(255*0.2) ~ 50
-				imgData.data[pos+3] = 50*lens.predictedimage[i];
+				// imgData.data[pos+3] = 50*lens.predictedimage[i];
+				// Without blurring:
+                imgData.data[pos+3] = 165*lens.predictedimage[i];
 			}else{
 				imgData.data[pos+3] = 255;
 			}
@@ -261,8 +294,8 @@
 		canvas.copyToClipboard(mode,imgData);
 	
 		if(mode == "image"){
-			// Blur the image
-			imgData = canvas.blur(imgData, lens);
+			// Blur the image? Try without!
+			// imgData = canvas.blur(imgData, lens);
 		}
 	
 		// Draw the image to the <canvas> in the DOM
@@ -399,7 +432,9 @@
 		if(!e) e = { x : 1000, y: 1000 }
 		// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
 		var coords = this.lens.pix2ang({x:e.x, y:e.y});
-		this.lens.add({ plane: 'source', size:  1.25, x: coords.x, y: coords.y });
+		// BUG! This source size needs to be propagated down from model setup...
+        this.lens.add({ plane: 'source', size:  0.7, x: coords.x, y: coords.y });
+        // BUG! This source size does not seem to be being passed to lens.js correctly...
 	
 		// Paste original image
 		this.paper.pasteFromClipboard();
