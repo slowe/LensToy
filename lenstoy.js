@@ -442,7 +442,6 @@
 		
 		// Add the source back
         this.lens.add(src);
-        // BUG! This source size does not seem to be being passed to lens.js correctly...
 
 		// Paste original image
 		this.paper.pasteFromClipboard();
