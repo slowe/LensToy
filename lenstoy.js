@@ -426,16 +426,24 @@
 	
 	LensToy.prototype.update = function(e){
 
+		// Get the size of the existing source
+		var src = this.lens.source[0];
+
 		// Remove existing sources
 		this.lens.removeAll('source');
 	
 		if(!e) e = { x : 1000, y: 1000 }
 		// Set the lens source to the current cursor position, transforming pixel coords to angular coords:
 		var coords = this.lens.pix2ang({x:e.x, y:e.y});
-		// BUG! This source size needs to be propagated down from model setup...
-        this.lens.add({ plane: 'source', size:  0.7, x: coords.x, y: coords.y });
+
+		// Update the source x,y positions
+		src.x = coords.x;
+		src.y = coords.y;
+		
+		// Add the source back
+        this.lens.add(src);
         // BUG! This source size does not seem to be being passed to lens.js correctly...
-	
+
 		// Paste original image
 		this.paper.pasteFromClipboard();
 
