@@ -13,10 +13,17 @@
 	window.onload = function(e){ 
 
 		// Create a LensToy object. The ID is that of the <div>, while the 
-        // pixel scale of the canvas is needed to set up 
-        // the model correctly. For the CFHTLS group, replace 1.0 with 2.0, 
-        // and for the galaxy, replace 1.0 with 4.0!
-		var toy = new LensToy({id:'lenstoy', pixscale:0.186/1.0});
+        // pixel scale of the canvas is needed to set up the model correctly.
+        // At the moment, several things need to be changed at the same time
+        // to switch between models. Search this file for the string EDIT.
+        
+        // Example, pixscale = 0.186/4.0
+        // CFHTLS_field, pixscale = 0.186, 
+        // CFHTLS_group, pixscale = 0.186/2.0, 
+        // CFHTLS_galaxy, pixscale = 0.186/4.0
+		
+        // EDIT:
+        var toy = new LensToy({id:'lenstoy', pixscale:0.186/4.0});
 		
 		var offmsg = "Try putting a small blue galaxy behind these massive yellow ones...";
 		
@@ -27,8 +34,11 @@
 			this.setStatus(offmsg);
 		});
         
-		// Load a particular model
-		toy.init('CFHTLS_field');
+        // EDIT to load a particular model
+		toy.init('Example');
+		// toy.init('CFHTLS_field');
+		// toy.init('CFHTLS_group');
+		// toy.init('CFHTLS_galaxy');
 		//lens.init();
 
 	}
@@ -81,11 +91,12 @@
 			<h1>Lens Toy</h1>
 		</header>
 	
-		<div id="status">Loading image...</div>
+		<div id="status">Loading lens model...</div>
 		<div id="main">
-			<!-- BUG: the background image should be loaded by the LensToy itself! -->
-            <!-- <img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:10;position:absolute;"/> -->
-			<img id="lensimg" src="CFHTLS_field_440x440.png" style="z-index:10;position:absolute;"/>
+            <!-- EDIT to choose appropriate background image: -->
+			<!--      BUG: the background image should be loaded by the LensToy itself! -->
+            <img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:10;position:absolute;"/>
+			<!-- <img id="lensimg" src="CFHTLS_field_440x440.png" style="z-index:10;position:absolute;"/> -->
 			<!-- <img id="lensimg" src="CFHTLS_group_220x220.png" style="z-index:10;position:absolute;"/> -->
 			<!-- <img id="lensimg" src="CFHTLS_galaxy_110x110.png" style="z-index:10;position:absolute;"/> -->
 			<div id="lenstoy" style="z-index:10;position:absolute;"></div>

@@ -1,6 +1,6 @@
 /*
  * Javascript Lens Toy
- * 2012-3 Stuart Lowe http://lcogt.net/
+ * 2012-3 Stuart Lowe http://lcogt.net/ and Phil Marshall (University of Oxford)
  * Requires lens.js
  *
  * Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
@@ -50,22 +50,25 @@
 		this.models.push({
 			name: 'Example',
 			src: "SL2SJ140156+554446_irg_100x100.png",
-            PSFwidth: 1.2,
+            PSFwidth: 0.8,
 			components: [
-				{plane: "lens", theta_e: 10.0, x:  0.0, y:   0.0},
-				{plane: "lens", theta_e:  3.0, x: -7.0, y:  27.0},
-				{plane: "lens", theta_e:  3.0, x: 37.0, y: -37.0},
-				{plane: "lens", theta_e:  3.0, x: 17.0, y: -52.0},
+				{plane: "lens", theta_e:  2.0, x:  0.0, y:  -1.0},
+				{plane: "lens", theta_e:  0.8, x: -1.3, y:   5.5},
+				{plane: "lens", theta_e:  0.8, x:  7.5, y:  -7.4},
+				{plane: "lens", theta_e:  0.8, x:  3.5, y: -10.4},
 				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
 			],
 			events: {
 				mousemove: function(e){
-					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
 					var msg = "";
-					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
-					if(k >= 0.4 && k < 0.7) msg = "The space around that massive yellow galaxy is being warped, distorting the image of the source";
-					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
-					this.setStatus(this.model.name+': '+msg);
+					// Useful when setting up a model:
+                    // var t = this.lens.pix2ang({x:e.x, y:e.y});
+                    // var msg = "Cursor position = "+(t.x.toFixed(1))+","+(t.y.toFixed(1))+":   ";
+					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+					if(k < 0.4) msg = msg+"Out here the image of the source is only being weakly lensed";
+					if(k >= 0.4 && k < 0.7) msg = msg+"The space around that massive yellow galaxy is being warped, distorting the image of the source";
+					if(k >= 0.7) msg = msg+"The source is right behind the lens now - and is being multiply-imaged";
+					this.setStatus(msg);
 				}
 			}
 		});
