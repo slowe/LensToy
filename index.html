@@ -3,7 +3,7 @@
 <head>
 	<meta charset='utf-8' />
 	<meta http-equiv="X-UA-Compatible" content="chrome=1" />
-	<meta name="description" content="Lenstoy : A gravitational lens simulator in Javascript/HTML5" />
+	<meta name="description" content="Lens Toy : A gravitational lens simulator in Javascript/HTML5" />
 	<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 	<title>Lenstoy</title>
 	<script src="https://raw.github.com/slowe/lensjs/master/lens.js"></script>
@@ -15,19 +15,33 @@
 
 	window.onload = function(e){ 
 
-		// Create a FITS object. The ID is that of the <div>
-		var toy = new LensToy({id:'lenstoy'});
+		// Create a LensToy object. The ID is that of the <div>, while the 
+        // pixel scale of the canvas is needed to set up the model correctly.
+        // At the moment, several things need to be changed at the same time
+        // to switch between models. Search this file for the string EDIT.
+        
+        // Example, pixscale = 0.186/4.0
+        // CFHTLS_field, pixscale = 0.186, 
+        // CFHTLS_group, pixscale = 0.186/2.0, 
+        // CFHTLS_galaxy, pixscale = 0.186/4.0
 		
-		var offmsg = "Try putting a faint blue galaxy behind these massive yellow ones...";
-		// Attach a function to the load event
+        // EDIT:
+        var toy = new LensToy({id:'lenstoy', pixscale:0.186/4.0});
+		
+		var offmsg = "Try putting a small blue galaxy behind these massive yellow ones...";
+		
+        // Attach a function to the load event
 		toy.bind("mouseout",function(){
 			this.setStatus(offmsg);
 		}).bind("loadimage",function(){
 			this.setStatus(offmsg);
 		});
-		
-		// Load a particular model
-		toy.init('CFHTLS4');
+
+        // EDIT to load a particular model
+		toy.init('Example');
+		// toy.init('CFHTLS_field');
+		// toy.init('CFHTLS_group');
+		// toy.init('CFHTLS_galaxy');
 		//lens.init();
 
 	}
@@ -40,14 +54,18 @@
 	#lensimg { border: 2px solid #606060; }
 	code { color: #5555aa; }
 	pre { color: #5555aa; }
-	#main { position: relative; min-height:420px; cursor: crosshair; -webkit-user-select: none; -moz-user-select: none;}
-	#status { margin-bottom: 0.5em; height: 2em; }
-	#lenstoy, #lensimg { width:400px; height:400px; }
 	.footnote { font-size: 0.8em; }
+	
+    #main { position: relative; height:480px; cursor: crosshair; }
+	#status { width:440px; margin-bottom: 0.5em; height: 1em; margin-bottom: 1em; }
+	
+    #lenstoy, #lensimg { position: relative; top:10px; width:440px; height:440px; }
+    
 	</style>
 </head>
 <body>
 
+<<<<<<< HEAD
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
@@ -67,10 +85,9 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
 
-		<div id="status">Loading image...</div>
+		<div id="status">Loading gravitational lens model...</div>
 		<br>
 		<div id="main">
-			<!-- <img src="simarc1.png" id="lensimg" style="z-index:1;position:absolute;"/> -->
 			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
 			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
 		</div>
@@ -126,6 +143,5 @@ $ git checkout gh-pages
     </div>
 
     
-
   </body>
 </html>
