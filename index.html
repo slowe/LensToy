@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset='utf-8' />
-	<title>LensToy</title>
+	<title>Lens Toy</title>
 	<script type="text/javascript" src="https://raw.github.com/slowe/lensjs/master/lens.js"></script>
 	<script type="text/javascript" src="https://raw.github.com/slowe/lensjs/master/canvas.js"></script>
 	<script type="text/javascript" src="https://raw.github.com/jasondavies/conrec.js/master/conrec.js"></script>
@@ -28,7 +28,7 @@
 		});
         
 		// Load a particular model
-		toy.init('CFHTLS_field');
+		toy.init('SW_field');
 		//lens.init();
 
 	}
@@ -81,11 +81,12 @@
 			<h1>Lens Toy</h1>
 		</header>
 	
-		<div id="status">Loading image...</div>
+		<div id="status">Loading model...</div>
 		<div id="main">
 			<!-- BUG: the background image should be loaded by the LensToy itself! -->
             <!-- <img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:10;position:absolute;"/> -->
-			<img id="lensimg" src="CFHTLS_field_440x440.png" style="z-index:10;position:absolute;"/>
+			<img id="lensimg" src="SW_field_440x440.png" style="z-index:10;position:absolute;"/>
+			<!-- <img id="lensimg" src="CFHTLS_field_440x440.png" style="z-index:10;position:absolute;"/> -->
 			<!-- <img id="lensimg" src="CFHTLS_group_220x220.png" style="z-index:10;position:absolute;"/> -->
 			<!-- <img id="lensimg" src="CFHTLS_galaxy_110x110.png" style="z-index:10;position:absolute;"/> -->
 			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
