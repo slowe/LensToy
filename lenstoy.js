@@ -73,6 +73,39 @@
 			}
 		});
 		this.models.push({
+			name: 'SW_field',
+			src: "SW_field_440x440.png",
+            PSFwidth: 0.8,
+			components: [
+				{plane: "lens", theta_e: 2.3, x:   8.2, y: -11.3},
+				{plane: "lens", theta_e: 0.7, x:   7.1, y:  -9.9},
+				{plane: "lens", theta_e: 1.0, x:  17.3, y:   8.2},
+				{plane: "lens", theta_e: 0.7, x:  13.7, y:  14.4},
+				{plane: "lens", theta_e: 0.7, x:  12.9, y:  14.0},
+				{plane: "lens", theta_e: 0.7, x:  17.1, y:  24.6},
+				{plane: "lens", theta_e: 0.7, x: -15.8, y:   1.9},
+				{plane: "lens", theta_e: 1.0, x: -23.4, y:  10.8},
+				{plane: "lens", theta_e: 1.0, x: -19.9, y:  18.0},
+				{plane: "lens", theta_e: 0.7, x:   7.6, y: -30.5},
+				{plane: "lens", theta_e: 1.0, x:   2.4, y: -35.2},
+				{plane: "lens", theta_e: 1.0, x:  13.7, y: -34.6},
+				{plane: "lens", theta_e: 1.0, x: -27.2, y: -37.8},
+				{plane: "source", size:  0.7, x: 1000.0, y:  1000.0}
+			],
+			events: {
+				mousemove: function(e){
+					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+					var msg = "";
+					if(k < 0.4) msg = "Out here the image of the source is only being weakly lensed";
+					if(k >= 0.4 && k < 0.7) msg = "The space around those massive yellow galaxies is being warped, distorting the image of the source";
+					if(k >= 0.7) msg = "The source is right behind the lens now - and is being multiply-imaged";
+					var t = this.lens.pix2ang({x:e.x, y:e.y});
+                    msg = msg+". Cursor position = "+(t.x.toFixed(1))+","+(t.y.toFixed(1));
+					this.setStatus(msg);
+				}
+			}
+		});
+		this.models.push({
 			name: 'CFHTLS_field',
 			src: "CFHTLS_field_440x440.png",
             PSFwidth: 0.8,
@@ -298,7 +331,7 @@
 	
 		if(mode == "image"){
 			// Blur the image? Try without!
-			// imgData = canvas.blur(imgData, lens);
+			// imgData = canvas.blur(imgData, lens.w, lens.h);
 		}
 	
 		// Draw the image to the <canvas> in the DOM
@@ -486,7 +519,7 @@
 		return this;
 	}
 	
-		// Attach a handler to an event for the Canvas object in a style similar to that used by jQuery
+	// Attach a handler to an event for the Canvas object in a style similar to that used by jQuery
 	// .bind(eventType[,eventData],handler(eventObject));
 	// .bind("resize",function(e){ console.log(e); });
 	// .bind("resize",{me:this},function(e){ console.log(e.data.me); });
