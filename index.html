@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset='utf-8' />
-	<title>LensToy</title>
+	<title>Lens Toy</title>
 	<script type="text/javascript" src="https://rawgithub.com/slowe/lensjs/master/lens.js"></script>
 	<script type="text/javascript" src="https://rawgithub.com/slowe/lensjs/master/canvas.js"></script>
 	<script type="text/javascript" src="https://rawgithub.com/jasondavies/conrec.js/master/conrec.js"></script>
@@ -18,12 +18,13 @@
         // to switch between models. Search this file for the string EDIT.
         
         // Example, pixscale = 0.186/4.0
+        // SW_field, pixscale = 0.186, 
         // CFHTLS_field, pixscale = 0.186, 
         // CFHTLS_group, pixscale = 0.186/2.0, 
         // CFHTLS_galaxy, pixscale = 0.186/4.0
 		
         // EDIT:
-        var toy = new LensToy({id:'lenstoy', pixscale:0.186/4.0});
+        var toy = new LensToy({id:'lenstoy', pixscale:0.186});
 		
 		var offmsg = "Try putting a small blue galaxy behind these massive yellow ones...";
 		
@@ -35,10 +36,11 @@
 		});
         
         // EDIT to load a particular model
-		toy.init('Example');
+		// toy.init('Example');
 		// toy.init('CFHTLS_field');
 		// toy.init('CFHTLS_group');
 		// toy.init('CFHTLS_galaxy');
+		toy.init('SW_field');
 		//lens.init();
 
 	}
@@ -91,11 +93,12 @@
 			<h1>Lens Toy</h1>
 		</header>
 	
-		<div id="status">Loading lens model...</div>
+		<div id="status">Loading model...</div>
 		<div id="main">
             <!-- EDIT to choose appropriate background image: -->
 			<!--      BUG: the background image should be loaded by the LensToy itself! -->
-            <img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:10;position:absolute;"/>
+            <!-- <img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:10;position:absolute;"/> -->
+			<img id="lensimg" src="SW_field_440x440.png" style="z-index:10;position:absolute;"/>
 			<!-- <img id="lensimg" src="CFHTLS_field_440x440.png" style="z-index:10;position:absolute;"/> -->
 			<!-- <img id="lensimg" src="CFHTLS_group_220x220.png" style="z-index:10;position:absolute;"/> -->
 			<!-- <img id="lensimg" src="CFHTLS_galaxy_110x110.png" style="z-index:10;position:absolute;"/> -->
