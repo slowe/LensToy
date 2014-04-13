@@ -21,12 +21,13 @@
         // to switch between models. Search this file for the string EDIT.
         
         // Example, pixscale = 0.186/4.0
+        // SW_field, pixscale = 0.186, 
         // CFHTLS_field, pixscale = 0.186, 
         // CFHTLS_group, pixscale = 0.186/2.0, 
         // CFHTLS_galaxy, pixscale = 0.186/4.0
 		
         // EDIT:
-        var toy = new LensToy({id:'lenstoy', pixscale:0.186/4.0});
+        var toy = new LensToy({id:'lenstoy', pixscale:0.186});
 		
 		var offmsg = "Try putting a small blue galaxy behind these massive yellow ones...";
 		
@@ -38,10 +39,11 @@
 		});
 
         // EDIT to load a particular model
-		toy.init('Example');
+		// toy.init('Example');
 		// toy.init('CFHTLS_field');
 		// toy.init('CFHTLS_group');
 		// toy.init('CFHTLS_galaxy');
+		toy.init('SW_field');
 		//lens.init();
 
 	}
@@ -65,13 +67,12 @@
 </head>
 <body>
 
-<<<<<<< HEAD
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
           <a id="forkme_banner" href="https://github.com/slowe/LensToy">View on GitHub</a>
 
-          <h1 id="project_title">LensToy</h1>
+          <h1 id="project_title">Lens Toy</h1>
           <h2 id="project_tagline">A gravitational lens simulator in Javascript/HTML5</h2>
 
             <section id="downloads">
@@ -88,7 +89,7 @@
 		<div id="status">Loading gravitational lens model...</div>
 		<br>
 		<div id="main">
-			<img id="lensimg" src="SL2SJ140156+554446_irg_100x100.png" style="z-index:1;position:absolute;"/>
+			<img id="lensimg" src="SW_field_440x440.png" style="z-index:10;position:absolute;"/>
 			<div id="lenstoy" style="z-index:10;position:absolute;"></div>
 		</div>
 		<div id="options">
@@ -137,7 +138,7 @@ $ git checkout gh-pages
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">Lenstoy maintained by <a href="https://github.com/slowe">slowe</a>,  <a href="https://github.com/drphilmarshall">drphilmarshall</a> and <a href="https://github.com/aprajita">aprajita</a></p>
+        <p class="copyright">LensToy is maintained by <a href="https://github.com/slowe">slowe</a>,  <a href="https://github.com/drphilmarshall">drphilmarshall</a> and <a href="https://github.com/aprajita">aprajita</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
