@@ -58,17 +58,17 @@
 				{plane: "lens", theta_e:  0.8, x:  3.5, y: -10.4},
 				{plane: "source", size:  1.25, x: 1000.0, y:  1000.0}
 			],
-			events: {
-				mousemove: function(e){
-					var msg = "";
-					// Useful when setting up a model:
-                    // var t = this.lens.pix2ang({x:e.x, y:e.y});
-                    // var msg = "Cursor position = "+(t.x.toFixed(1))+","+(t.y.toFixed(1))+":   ";
-					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
-					if(k < 0.4) msg = msg+"Out here the image of the source is only being weakly lensed";
-					if(k >= 0.4 && k < 0.7) msg = msg+"The space around that massive yellow galaxy is being warped, distorting the image of the source";
-					if(k >= 0.7) msg = msg+"The source is right behind the lens now - and is being multiply-imaged";
-					this.setStatus(msg);
+//			events: {
+//				mousemove: function(e){
+//					var msg = "";
+//					// Useful when setting up a model:
+//                    // var t = this.lens.pix2ang({x:e.x, y:e.y});
+//                    // var msg = "Cursor position = "+(t.x.toFixed(1))+","+(t.y.toFixed(1))+":   ";
+//					var k = this.lens.mag[this.lens.xy2i(e.x,e.y)].kappa;
+//					if(k < 0.4) msg = msg+"Out here the image of the source is only being weakly lensed";
+//					if(k >= 0.4 && k < 0.7) msg = msg+"The space around that massive yellow galaxy is being warped, distorting the image of the source";
+//					if(k >= 0.7) msg = msg+"The source is right behind the lens now - and is being multiply-imaged";
+//					this.setStatus(msg);
 				}
 			}
 		});
